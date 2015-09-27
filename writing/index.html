@@ -1,0 +1,15 @@
+---
+layout: default
+title: loren.io
+---
+
+<h1>.writing</h1>
+<p>Blog posts, articles, musing... whatever it is that I want to write about goes here.</p>
+<hr/>
+
+<div class="listing">
+	{% for post in site.categories.writing %}
+		<h4>{{ post.title }} :: {{ post.date | date_to_string }}</h4>
+		<p>{{ post.excerpt }} <a href="{{ post.url }}">More</a></p>
+	{% endfor %}
+</div>

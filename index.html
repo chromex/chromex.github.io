@@ -1,23 +1,29 @@
 ---
 layout: default
+title: loren.io
 ---
 
 <div class="home">
 
-  <h1 class="page-heading">Posts</h1>
+  <!-- intro -->
+  <h1>loren.hoffman</h1>
+  <p>I am a software developer with a background in <strong>game</strong> and <strong>graphic</strong> systems development.</p>
+  <p>Permanently interested in technology and its development, programming is the channel for my passion of <strong>making</strong>. It is the itch that cannot be scratched. I pursued games for the tangible feedback given by their development however having been involved in the development of <strong>tools</strong>, <strong>servers</strong>, and other <strong>systems</strong>, I have found no lack of interest with which to channel my <strong>creativity</strong>.</p>
+  <p>I am currently located in <strong>Seattle, WA</strong>.</p>
+  <hr/>
 
-  <ul class="post-list">
+  <!-- projects -->
+  <div class="listing">
+    <h2 class="muted">.news</h2>
     {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
+      {% if post.categories contains "writing" or post.categories contains "news" %}
+        <h4>{{ post.title }} :: {{ post.date | date_to_string }}</h4>
+        <p>{{ post.excerpt }} <a href="{{ post.url | prepend: site.baseurl }}">More</a></p>
+      {% endif %}
     {% endfor %}
-  </ul>
+  </div> 
 
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+  <!-- TODO: Put the RSS link in the header -->
+  <!-- <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p> -->
 
 </div>

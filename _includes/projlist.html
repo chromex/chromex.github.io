@@ -1,0 +1,10 @@
+<h2 class="muted">.{{ include.subcategory }}</h2>
+
+<div class="listing">
+	{% for post in site.categories.projects %}
+		{% if post.categories contains include.subcategory %}
+			<h4>{{ post.title }}</h4>
+			<p>{{ post.excerpt }} <a href="{% if post.external-url %}{{ post.external-url }}{% else %}{{ post.url }}{% endif %}">More</a></p>
+		{% endif %}
+	{% endfor %}
+</div>

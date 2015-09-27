@@ -1,20 +1,45 @@
 <!DOCTYPE html>
-<html>
-
-  {% include head.html %}
-
+<html lang="en">
+  <head>
+    <title>{{ page.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/syntax.css">
+    <link href="/css/bootstrap.css" rel="stylesheet" media="screen">
+    <style>
+      body {
+        padding-top: 60px;
+      }
+    </style>
+  </head>
   <body>
-
-    {% include header.html %}
-
-    <div class="page-content">
-      <div class="wrapper">
-        {{ content }}
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">{{ site.name }}</a>
+          <ul class="nav">
+            <li><a href="/writing">.writing</a></li>
+            <li><a href="/projects">.projects</a></li>
+            <li><a href="/contact">.contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                .resume
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="/assets/LorenHoffman-Resume-2013.docx">*.docx</a></li>
+                <li><a href="/assets/LorenHoffman-Resume-2013.pdf">*.pdf</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
+    <div class="container">
 
-    {% include footer.html %}
+      {{ content }}
 
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
   </body>
-
 </html>
