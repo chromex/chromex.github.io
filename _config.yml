@@ -14,4 +14,5 @@ markdown: redcarpet
 
 # Plugins
 gems:
+   - ruby-oembed
    - jekyll-oembed
