@@ -11,3 +11,7 @@ highlighter: pygments
 
 # Build settings
 markdown: redcarpet
+
+# Plugins
+gems:
+   - jekyll-oembed
