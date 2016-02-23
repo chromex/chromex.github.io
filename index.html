@@ -18,7 +18,7 @@ title: loren.io
     {% for post in site.posts %}
       {% if post.categories contains "writing" or post.categories contains "news" %}
         <h4>{{ post.title }} :: {{ post.date | date_to_string }}</h4>
-        <p>{{ post.excerpt }} <a href="{{ post.url | prepend: site.baseurl }}">More</a></p>
+        <p>{{ post.excerpt }} <a href="{{ post.url }}">More</a></p>
       {% endif %}
     {% endfor %}
   </div> 
