@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=7
+	build=8
 	
 	debug=false
 	t=0
@@ -17,6 +17,8 @@ function _init()
 	p_r=false
 	money=0
 	phase=0
+	t_sugar=false
+	t_bone=false
 	
 	--chef
 	cx=60
@@ -24,10 +26,12 @@ function _init()
 	moving=false
 	cr=false
 	has_sugar=false
+	has_bone=false
 	
 	if false then
 		state=1
-		phase=1
+		phase=2
+		has_sugar=true
 	end
 end
 
@@ -78,6 +82,8 @@ end
 -- game
 
 sugar_box={20,55,34,63}
+bone_box={20,65,34,73}
+table_box={92,52,110,72}
 
 function updategame()
 	moving=false
@@ -113,6 +119,23 @@ function updategame()
 			has_sugar=true
 			phase=2
 		end
+	elseif phase==2 then
+		if chef_in(table_box) then
+			phase=3
+			has_sugar=false
+			t_sugar=true
+		end
+	elseif phase==3 then
+		if btnp(5) and chef_in(bone_box) then
+			phase=4
+			has_bone=true
+		end
+	elseif phase==4 then
+		if chef_in(table_box) then
+			phase=5
+			has_bone=false
+			t_bone=true
+		end
 	end
 end
 
@@ -138,6 +161,23 @@ function drawgame()
 	elseif phase==1 then
 	 draw_sugar(sugar_box[1],sugar_box[2])
 	 print("pick up sugar with —",22,80,14)
+ -- phase 2 --
+	elseif phase==2 then
+		draw_table()
+		print("place sugar on table", 24,80,14)
+	-- phase 3 --
+	elseif phase==3 then
+		draw_table()
+		draw_bone(bone_box[1],bone_box[2])
+		print("now get the bone!",30,80,14)
+	-- phase 4 -- 
+	elseif phase==4 then
+		draw_table()
+		print("and deliver it",36,80,14)
+	-- phase 5 --
+	elseif phase==5 then
+		draw_table()
+		print("now make a marshmallow",20,80,14)
 	end
 	
 	draw_chef(false,false)
@@ -158,8 +198,8 @@ function draw_chef()
 		spr(6,cx,cy,1,1,cr)
 	end
 	
-	if false or has_sugar then
-		local sp = false and 9 or 10
+	if has_bone or has_sugar then
+		local sp = has_bone and 9 or 10
 		if cr then
 			spr(sp,cx+7,cy)
 		else
@@ -174,6 +214,18 @@ end
 
 function draw_bone(x,y)
 	spr(9,x,y)
+end
+
+function draw_table()
+	rectfill(table_box[1]+8,table_box[2],table_box[3]-1,table_box[4]-1,9)
+	line(101,72,101,74,5)
+	line(108,72,108,74,5)
+	if t_sugar then
+		draw_sugar(table_box[1]+9,table_box[2]+1)
+	end
+	if t_bone then
+		draw_bone(table_box[1]+9,table_box[2]+10)
+	end
 end
 
 function lerp(x,y,spd)
