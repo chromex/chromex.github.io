@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=14
+	build=15
 	
 	debug=false
 	t=0
@@ -34,6 +34,7 @@ function _init()
 	boiling=0
 	e_iron=false
 	iron=0
+	heating=0
 	
 	--chef
 	cx=124
@@ -98,8 +99,9 @@ sugar_box={88,32,96,48}
 bone_box={160,32,168,48}
 table_box={112,46,144,56}
 cauldron_box={120,56,136,74}
+iron_box={120,71,136,87}
 iron_max=20
-iron_colors={1,1,5,6,7}
+iron_colors={1,5,6,6,7}
 
 function go_phase(p)
 	phase=p
@@ -180,7 +182,7 @@ function updategame()
 		t_bone=min(t_bone+20,20)
 	end
 	
-	-- cooking
+	-- boiling
 	if boiling>0 then
 		-- todo: do some cookin'
 		boiling-=1
@@ -195,6 +197,17 @@ function updategame()
 	end
 	if btnp(5) and chef_in(cauldron_box) and t_bone>0 and t_sugar>0 and iron<iron_max then
 		boiling=min(boiling+10,10)
+	end
+	
+	-- baking
+	if heating>0 then
+		heating-=1
+		if t%10==0 then
+			iron-=1
+		end
+	end
+	if btnp(5) and chef_in(iron_box) and iron>0 then
+		heating=min(heating+10,10)
 	end
 
 	-- phase shifts
@@ -260,6 +273,9 @@ function drawgame()
 		spr(s,120,56,2,2,t0%2==0)
 		
 		pal(1,iron_colors[flr(iron/5)+1])
+		if heating>0 then
+			pal(13,t0%2==0 and 10 or 9)
+		end
 		spr(44,120,71,2,2)
 		pal()
 	end
@@ -271,7 +287,8 @@ function drawgame()
 		draw_box(table_box,8)
 		draw_box(sugar_box,8)
 		draw_box(bone_box,8)
-		draw_box(cauldron_box,8)
+		--draw_box(cauldron_box,8)
+		draw_box(iron_box,8)
 		fillp(0)
 	end
 	
