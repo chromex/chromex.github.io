@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=10
+	build=11
 	
 	debug=false
 	t=0
@@ -95,9 +95,9 @@ end
 -->8
 -- game
 
-sugar_box={88,32,96,40}
-bone_box={20,65,34,73}
-table_box={92,52,110,72}
+sugar_box={88,32,96,48}
+bone_box={160,32,168,48}
+table_box={112,46,144,56}
 
 function go_phase(p)
 	phase=p
@@ -129,6 +129,7 @@ function go_phase(p)
 end
 
 function updategame()
+ -- movement
 	moving=false
 	if btn(0) then
 		cx-=1
@@ -152,30 +153,46 @@ function updategame()
 		moving=true
 		p_d=true
 	end
+
+	-- pickups
+	if not has_sugar and not has_bone then
+ 	if e_sugar and btnp(5) and chef_in(sugar_box) then
+ 		has_sugar=true
+ 	elseif e_bone and btnp(5) and chef_in(bone_box) then
+ 	 has_bone=true
+ 	end
+	end
 	
+	-- dropoffs
+	if has_sugar and chef_in(table_box) then
+		has_sugar=false
+		t_sugar=true
+	end
+	if has_bone and chef_in(table_box) then
+		has_bone=false
+		t_bone=true
+	end
+	
+	-- phase shifts
 	if phase==0 then
 		if p_u and p_d and p_r and p_l then
 			go_phase(1)
 		end
 	elseif phase==1 then
-		if btnp(5) and chef_in(sugar_box) then
+		if has_sugar then
 			go_phase(2)
 		end
 	elseif phase==2 then
-		-- todo: this should trigger on sugar on table
-		if chef_in(table_box) then
+		if t_sugar then
 			go_phase(3)
 		end
 	elseif phase==3 then
-		if btnp(5) and chef_in(bone_box) then
-			phase=4
-			has_bone=true
+		if has_bone then
+			go_phase(4)
 		end
 	elseif phase==4 then
-		if chef_in(table_box) then
-			phase=5
-			has_bone=false
-			t_bone=true
+		if t_bone then
+			go_phase(5)
 		end
 	end
 end
@@ -185,30 +202,32 @@ function drawgame()
  
  camera(64,0)
  map(8,16,0,0,32,16,mlayer)
-	
-	-- phase 1 --
-	if phase==1 then
-	 draw_sugar(sugar_box[1],sugar_box[2])
- -- phase 2 --
-	elseif phase==2 then
-		draw_table()
-	-- phase 3 --
-	elseif phase==3 then
-		draw_table()
-		draw_bone(bone_box[1],bone_box[2])
-		print("now get the bone!",30,10,14)
-	-- phase 4 -- 
-	elseif phase==4 then
-		draw_table()
-		print("and deliver it",36,10,14)
-	-- phase 5 --
-	elseif phase==5 then
-		map(16,16,0,0,16,16,1)
-		draw_table()
-		print("now make a marshmallow",20,10,14)
+ 
+ -- pickups
+ if e_sugar then
+ 	draw_sugar(sugar_box[1],sugar_box[2])
+ end
+ if e_bone then
+ 	draw_bone(bone_box[1],bone_box[2])
+ end
+ 
+ -- drop offs {112,46,144,56}
+ if t_sugar then
+		draw_sugar(117,47)
+	end
+	if t_bone then
+		draw_bone(131,47)
 	end
 	
 	draw_chef(false,false)
+	
+	if debug then
+		fillp(0b0011001111001100)
+		draw_box(table_box,8)
+		draw_box(sugar_box,8)
+		draw_box(bone_box,8)
+		fillp(0)
+	end
 	
 	-- top display
 	camera(0,0)
@@ -216,6 +235,8 @@ function drawgame()
 	--rectfill(0,0,127,7,8)
 	--line(0,7,127,7,2)
 	print(tip,tipx,9,14)
+	
+	-- special tutorial overlay
 	if phase==0 then
 		if p_u then
 			print("”",68,9,10)
@@ -249,11 +270,7 @@ function draw_chef()
 	
 	if has_bone or has_sugar then
 		local sp = has_bone and 9 or 10
-		if cr then
-			spr(sp,cx+7,cy)
-		else
-			spr(sp,cx-7,cy,1,1,true)
-		end
+		spr(sp,cx,cy-9,1,1,cr)
 	end
 end
 
@@ -263,22 +280,6 @@ end
 
 function draw_bone(x,y)
 	spr(9,x,y)
-end
-
-function draw_table()
-	rectfill(table_box[1]+8,table_box[2],table_box[3]-1,table_box[4]-1,9)
-	line(101,72,101,74,5)
-	line(108,72,108,74,5)
-	if t_sugar then
-		draw_sugar(table_box[1]+9,table_box[2]+1)
-	end
-	if t_bone then
-		draw_bone(table_box[1]+9,table_box[2]+10)
-	end
-end
-
-function lerp(x,y,spd)
-	return x + (y - x) * spd
 end
 
 function draw_box(box,c)
