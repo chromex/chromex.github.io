@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=12
+	build=13
 	
 	debug=false
 	t=0
@@ -27,8 +27,8 @@ function _init()
 	p_r=false
 	money=0
 	phase=0
-	t_sugar=false
-	t_bone=false
+	t_sugar=0
+	t_bone=0
 	e_table=false
 	e_cauldron=false
 	boiling=3
@@ -40,12 +40,6 @@ function _init()
 	cr=false
 	has_sugar=false
 	has_bone=false
-	
-	if false then
-		state=1
-		phase=2
-		has_sugar=true
-	end
 end
 
 function _update()
@@ -71,8 +65,8 @@ function _draw()
 	if debug then
 		rectfill(0,128-13,127,127,8)
 		line(0,128-14,127,128-14,5)
-		print("phase:"..phase.." state:"..state,1,128-6,2)
-		print("money:"..money,1,128-12,2)
+		print("p:"..phase.." s:"..state,1,128-6,2)
+		print("m:"..money.." tb:"..t_bone.." ts:"..t_sugar,1,128-12,2)
 	end
 end
 -->8
@@ -171,15 +165,21 @@ function updategame()
 	-- dropoffs
 	if has_sugar and chef_in(table_box) then
 		has_sugar=false
-		t_sugar=true
+		t_sugar=min(t_sugar+3,3)
 	end
 	if has_bone and chef_in(table_box) then
 		has_bone=false
-		t_bone=true
+		t_bone=min(t_bone+3,3)
 	end
 	
 	-- cooking
-	boiling = chef_in(cauldron_box) and t_bone and t_sugar
+	if boiling>0 then
+		-- todo: do some cookin'
+		boiling-=1
+	end
+	if btnp(5) and chef_in(cauldron_box) and t_bone and t_sugar then
+		boiling=min(boiling+10,10)
+	end
 
 	-- phase shifts
 	if phase==0 then
@@ -191,7 +191,7 @@ function updategame()
 			go_phase(2)
 		end
 	elseif phase==2 then
-		if t_sugar then
+		if t_sugar>0 then
 			go_phase(3)
 		end
 	elseif phase==3 then
@@ -199,7 +199,7 @@ function updategame()
 			go_phase(4)
 		end
 	elseif phase==4 then
-		if t_bone then
+		if t_bone>0 then
 			go_phase(5)
 		end
 	end
@@ -225,16 +225,17 @@ function drawgame()
  	line(116,56,116,60,5)
  	line(139,56,139,60,5)
  end
- if t_sugar then
+ -- todo:dither these
+ if t_sugar>0 then
 		draw_sugar(117,47)
 	end
-	if t_bone then
+	if t_bone>0 then
 		draw_bone(131,47)
 	end
 	
 	-- production
 	if e_cauldron then
-		local s = boiling and 46 or 14
+		local s = boiling>0 and 46 or 14
 		local t0 = flr(t/6)
 		spr(s,120,56,2,2,t0%2==0)
 	end
