@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=4
+	build=5
 	
 	debug=false
 	t=0
