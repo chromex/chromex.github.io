@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=5
+	build=6
 	
 	debug=false
 	t=0
@@ -23,6 +23,12 @@ function _init()
 	cy=60
 	moving=false
 	cr=false
+	has_sugar=false
+	
+	if false then
+		state=1
+		phase=1
+	end
 end
 
 function _update()
@@ -71,6 +77,8 @@ end
 -->8
 -- game
 
+sugar_box={20,55,34,63}
+
 function updategame()
 	moving=false
 	if btn(0) then
@@ -100,6 +108,11 @@ function updategame()
 		if p_u and p_d and p_r and p_l then
 			phase=1
 		end
+	elseif phase==1 then
+		if btnp(5) and chef_in(sugar_box) then
+			has_sugar=true
+			phase=2
+		end
 	end
 end
 
@@ -123,7 +136,8 @@ function drawgame()
 		end
 	-- phase 1 --
 	elseif phase==1 then
-	 draw_sugar(20,55)
+		draw_box(sugar_box,8)
+	 draw_sugar(sugar_box[1],sugar_box[2])
 	 print("pick up sugar with —",22,80,14)
 	end
 	
@@ -137,7 +151,7 @@ function draw_aline(x,y)
 	spr(0+t0%3,x,y)
 end
 
-function draw_chef(b,s)
+function draw_chef()
 	local t0=flr(t/3)
 	if moving then
 	 spr(7+t0%2,cx,cy,1,1,cr)
@@ -145,8 +159,8 @@ function draw_chef(b,s)
 		spr(6,cx,cy,1,1,cr)
 	end
 	
-	if b or s then
-		local sp = b and 9 or 10
+	if false or has_sugar then
+		local sp = false and 9 or 10
 		if cr then
 			spr(sp,cx+7,cy)
 		else
@@ -165,6 +179,16 @@ end
 
 function lerp(x,y,spd)
 	return x + (y - x) * spd
+end
+
+function draw_box(box,c)
+	rect(box[1],box[2],box[3]-1,box[4]-1,c)
+end
+
+function chef_in(box)
+	local x = cx+4
+	local y = cy+4
+	return x >= box[1] and x < box[3] and y >= box[2] and y < box[4]
 end
 
 __gfx__
