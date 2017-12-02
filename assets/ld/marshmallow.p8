@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=6
+	build=7
 	
 	debug=false
 	t=0
@@ -136,7 +136,6 @@ function drawgame()
 		end
 	-- phase 1 --
 	elseif phase==1 then
-		draw_box(sugar_box,8)
 	 draw_sugar(sugar_box[1],sugar_box[2])
 	 print("pick up sugar with —",22,80,14)
 	end
