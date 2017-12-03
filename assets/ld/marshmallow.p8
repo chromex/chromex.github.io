@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=23
+	build=24
 	
 	debug=false
 	t=0
@@ -40,6 +40,8 @@ function _init()
  e_upgrades=false
  e_customers=false
  newsmsg=""
+ e_leftroom=false
+ e_rightroom=false
 	
 	--chef
 	cx=124
@@ -49,13 +51,9 @@ function _init()
 	has_sugar=false
 	has_bone=false
 	
-	if false then
-		state=1
-		local i
- 	for i=0,8 do
- 		go_phase(i)
- 	end
- end
+	-- !!!debug tool!!!
+	skip_to(0,45,20)
+	-- !!!debug tool!!!
 end
 
 function _update()
@@ -108,11 +106,12 @@ end
 -->8
 -- game
 
-sugar_box={88,32,96,48}
-bone_box={160,32,168,48}
+-- constants
+sugar_box={86,32,98,48}
+bone_box={158,32,170,48}
 table_box={112,46,144,56}
-cauldron_box={118,56,138,71}
-iron_box={118,71,138,88}
+cauldron_box={116,56,140,71}
+iron_box={116,71,140,88}
 iron_max=20
 iron_colors={1,5,6,6,7}
 comp_box={74,42,85,54}
@@ -235,7 +234,6 @@ function updategame()
 	
 	-- boiling
 	if boiling>0 then
-		-- todo: do some cookin'
 		boiling-=1
 		if t%5==0 then
 			t_bone=max(t_bone-1,0)
@@ -321,10 +319,10 @@ function drawgame()
  
  -- pickups
  if e_sugar then
- 	draw_sugar(sugar_box[1],sugar_box[2],4)
+ 	draw_sugar(sugar_box[1]+2,sugar_box[2],4)
  end
  if e_bone then
- 	draw_bone(bone_box[1],bone_box[2],4)
+ 	draw_bone(bone_box[1]+2,bone_box[2],4)
  end
  
  -- drop offs {112,46,144,56}
@@ -362,6 +360,17 @@ function drawgame()
 	 else
 	 	spr(11,76,44)
 	 end
+ end
+ 
+ if phase>=8 then
+ 	if not e_leftroom then
+ 		spr(48,64,48)
+ 		spr(48,64,56)
+ 	end
+ 	if not e_rightroom then
+ 		spr(48,184,48)
+ 		spr(48,184,56)
+ 	end
  end
  
 	draw_chef(false,false)
@@ -423,9 +432,21 @@ end
 -->8
 --util
 
-function draw_aline(x,y)
-	local t0=flr(t/3)
-	spr(0+t0%3,x,y)
+-- 0==nothing
+-- 1==skip tutorial
+-- 2==skip first customers
+function skip_to(p,mo,ma)
+ if p==0 then return end
+	
+	state=1
+	local target=p==1 and 8 or 10
+	local i
+	for i=0,target do
+		go_phase(i)
+	end
+	
+	money=mo
+	mallow=ma
 end
 
 function draw_chef()
@@ -501,7 +522,7 @@ cdelta=0
 function add_customer()
 	if cdelta==0 and mallow>5 then
 		local col=flr(rnd(2))%2==0 and 12 or 14
-		add(customers,{x=256,p=40,r=false,c=col})
+		add(customers,{x=192,p=40,r=false,c=col})
 		cdelta=150
 	end
 	
