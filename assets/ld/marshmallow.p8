@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=22
+	build=23
 	
 	debug=false
 	t=0
@@ -154,7 +154,7 @@ function go_phase(p)
 		e_comp=true
 		e_upgrades=true
 	elseif p==8 then
-		tip=""
+		-- make sure state is correct
 		mlayer=6
 		money=0
 		mallow=20
@@ -163,6 +163,15 @@ function go_phase(p)
 		newsmsg="mews: mallow factory opens!"
 		tip="first customers incoming"
 		tipx=16
+	elseif p==9 then
+		tip="oh no! make more mallows"
+		tipx=16
+		newsmsg="news: mallow shortage hits"
+		e_sugar=true
+		e_bone=true
+	elseif p==10 then
+		tip=""
+		newsmsg="news: phew, mallows back"
 	end
 end
 
@@ -292,6 +301,14 @@ function updategame()
 	elseif phase==7 then
 		if btnp(5) and chef_in(comp_box) then
 			go_phase(8)
+		end
+	elseif phase==8 then
+		if mallow==0 then
+			go_phase(9)
+		end
+	elseif phase==9 then
+		if mallow>0 then
+			go_phase(10)
 		end
 	end
 end
