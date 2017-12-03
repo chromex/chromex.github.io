@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=21
+	build=22
 	
 	debug=false
 	t=0
@@ -49,7 +49,7 @@ function _init()
 	has_sugar=false
 	has_bone=false
 	
-	if true then
+	if false then
 		state=1
 		local i
  	for i=0,8 do
