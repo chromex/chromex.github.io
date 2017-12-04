@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=44
+	build=45
 	
 	debug=false
 	t=0
@@ -55,7 +55,7 @@ function _init()
 	
 	-- !!!debug tool!!!
 	--skip_to(3,180,40)
-	skip_to(4,1000,200)
+	--skip_to(4,2000,200)
 	-- !!!debug tool!!!
 end
 
@@ -231,6 +231,12 @@ function go_phase(p)
  elseif p==26 then
  	newsmsg="news: mallows un-healthy?"
  	arate=1
+ elseif p==27 then
+ 	newsmsg="news: mallows make you fat!!1!"
+ 	tip="oh no! they caught on!"
+ 	tipx=20
+ 	e_adults=false
+ 	cdelta=75
 	end
 end
 
@@ -385,6 +391,10 @@ function updategame()
  elseif phase==24 then
  	if money>=250 then
  		go_phase(25)
+ 	end
+ elseif phase==26 then
+ 	if mallow>240 and money>500 then
+ 		go_phase(27)
  	end
 	end
 end
