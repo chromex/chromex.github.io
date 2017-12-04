@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=30
+	build=31
 	
 	debug=false
 	t=0
@@ -211,7 +211,7 @@ function updategame()
 	end
 	if has_bone and chef_in(table_box) then
 		has_bone=false
-		add_bone(2)
+		add_bone(20)
 	end
 	
 	-- boiling
