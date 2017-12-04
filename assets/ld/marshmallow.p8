@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=42
+	build=43
 	
 	debug=false
 	t=0
@@ -55,7 +55,7 @@ function _init()
 	
 	-- !!!debug tool!!!
 	--skip_to(3,180,40)
-	--skip_to(4,1000,200)
+	skip_to(4,1000,200)
 	-- !!!debug tool!!!
 end
 
@@ -724,6 +724,7 @@ cstop=126
 adelta=75
 atime=0
 e_adults=false
+arate=1000
 
 function add_customer()
 	if mallow>5 then
@@ -746,13 +747,13 @@ function add_customer()
  	end
  	
  	if atime==0 and e_adults then
- 		local r1=flr(rnd(2))%2
- 		local r2=flr(rnd(2))%2
+ 		local r1=flr(rnd(2))
+ 		local r2=flr(rnd(arate))
  		local sp
  		if r1==0 then
- 			sp=r2==0 and 64 or 83
+ 			sp=r2!=0 and 64 or 83
  		else
- 		 sp=r2==0 and 80 or 88
+ 		 sp=r2!=0 and 80 or 88
  		end 
  		add(customers,
  		 {
@@ -762,7 +763,7 @@ function add_customer()
  		 	c=0,
  		 	y=flr(rnd(7)),
  		 	s=sp,
- 		 	fat=r2==1
+ 		 	fat=r2==0
  		 })
  		atime=adelta
  	end
