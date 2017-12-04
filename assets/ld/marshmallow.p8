@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=49
+	build=50
 	
 	debug=false
 	t=0
@@ -57,8 +57,8 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	--skip_to(3,180,40)
-	--skip_to(4,2000,500)
+	skip_to(3,180,40)
+	--skip_to(4,2000,300)
 	-- !!!debug tool!!!
 end
 
@@ -240,7 +240,7 @@ function go_phase(p)
  	tipx=20
  	e_adults=false
  	cdelta=75
- 	add_upgrade("hire chemist",525,10)
+ 	add_upgrade("hire chemist",600,10)
  elseif p==28 then
 		e_chemist=true
  	tip="...researching..."
@@ -250,15 +250,17 @@ function go_phase(p)
  	tipx=58
  	add_upgrade("add cocaine",40,11)
  elseif p==30 then
- 	tip="really? i mean... wtf"
- 	tipx=22
+ 	tip="dope. let them eat coke."
+ 	tipx=8
  	e_adults=true
 		cdelta=20
 		adelta=25
  	e_snow=true
+ 	cost=2
  	newsmsg="news: mallows better than ever"
  elseif p==31 then
- 	tip=""
+ 	tip="hehe"
+ 	tipx=56
  	newsmsg="news: wait! mallows are drugs!"
  	add_upgrade("buyout media",1000,12)
  elseif p==32 then
@@ -266,14 +268,14 @@ function go_phase(p)
  	tip="be more evil. why not."
  	tipx=20
  elseif p==33 then
- 	newsmsg="mnn: mallows are health"
+ 	newsmsg="mnn: mallows are life"
  	tip=""
  	tipx=30
  	add_upgrade("mallow toxin",800,13)
  elseif p==34 then
  	newsmsg="mnn: you are what you eat"
- 	tip="i'm leaving"
- 	tipx=42
+ 	tip="the other other white meat"
+ 	tipx=12
  	e_convert=true
 	end
 end
