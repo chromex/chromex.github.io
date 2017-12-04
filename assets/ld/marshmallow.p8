@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=40
+	build=41
 	
 	debug=false
 	t=0
@@ -784,7 +784,7 @@ function update_customers()
 		 end
 		else
 			c.x-=1
-			if c.x<-7 then
+			if c.x<57 then
 				c.r=true
 			end
 		end
