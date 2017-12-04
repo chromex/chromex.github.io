@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=28
+	build=29
 	
 	debug=false
 	t=0
@@ -51,7 +51,7 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(0,50,20)
+	skip_to(2,50,20)
 	-- !!!debug tool!!!
 end
 
@@ -108,7 +108,7 @@ end
 -- constants
 sugar_box={86,32,98,48}
 bone_box={158,32,170,48}
-table_box={112,46,144,56}
+table_box={112,46,144,64}
 cauldron_box={116,56,140,71}
 iron_box={116,71,140,88}
 iron_max=20
@@ -181,7 +181,7 @@ function go_phase(p)
  	tip="buy with —"
  	tipx=44
  elseif p==13 then
- 	newsmsg="news: craft mallow fad spreads"
+ 	newsmsg="news: craft mallow fad grows"
  	tip=""
 	end
 end
@@ -207,7 +207,7 @@ function updategame()
 	-- dropoffs
 	if has_sugar and chef_in(table_box) then
 		has_sugar=false
-		t_sugar=min(t_sugar+20,20)
+	 add_sugar(20)
 	end
 	if has_bone and chef_in(table_box) then
 		has_bone=false
@@ -301,6 +301,10 @@ function updategame()
 	elseif phase==11 then
 		if e_usecomp then
 			go_phase(12)
+		end
+	elseif phase==12 then
+		if robots[1].e==true or robots[2].e==true then
+			go_phase(13)
 		end
 	end
 end
@@ -445,6 +449,15 @@ function skip_to(p,mo,ma)
 	
 	money=mo
 	mallow=ma
+end
+
+function lerp(x,y,s)
+ if s>0.95 then s=1 end
+	return x+(y-x)*s
+end
+
+function add_sugar(amt)
+	t_sugar=min(t_sugar+amt,20)
 end
 
 function can_boil()
@@ -729,17 +742,20 @@ end
 -- automatons
 
 robot_anim={37,39,38,39}
-function draw_robot(x,y,i)
+function draw_robot(x,y,i,item)
  local t4=flr(t/4)
  if i then
  	spr(40+t4%4,x,y)
  else
 	 spr(robot_anim[1+t4%4],x,y)
+	 if item!=0 then
+	 	spr(item,x,y-8)
+	 end
 	end
 end
 
 robots={
- {e=false,x=88,y=40},
+ {e=false,x=88,y=40,spd=0.02,s=0,idle=true,item=0},
  {e=false,x=0,y=0},
  {e=false,x=0,y=0},
  {e=false,x=0,y=0},
@@ -751,16 +767,37 @@ function enable_bot(b)
 end
 
 function update_robots()
-	-- sugarbot
-	if robots[1].e then
-		-- lerp
+	local sugarbot=robots[1]
+	
+	if sugarbot.e then
+		-- todo only carry if empty table
+		if sugarbot.x==88 and sugarbot.y==40 and sugarbot.item==0 and t_sugar==0 then
+			sugarbot.item=25
+			sugarbot.idle=false
+		elseif not sugarbot.idle then
+			if sugarbot.item!=0 then
+ 			sugarbot.s=min(sugarbot.s+sugarbot.spd,1)
+ 		else
+ 			sugarbot.s=max(sugarbot.s-sugarbot.spd,0)
+ 		end
+ 
+ 		sugarbot.x=lerp(88,117,sugarbot.s)
+ 		sugarbot.y=lerp(40,55,sugarbot.s)
+ 	end
+ 	
+		if sugarbot.item!=0 and sugarbot.s==1 then
+			sugarbot.item=0
+			add_sugar(20)
+		elseif sugarbot.item==0 and sugarbot.s==0 then
+		 sugarbot.idle=true
+		end
 	end
 end
 
 function draw_robots()
 	for r in all(robots) do
 		if r.e==true then
-			draw_robot(r.x, r.y, true)
+			draw_robot(r.x,r.y,r.idle,r.item)
 		end
 	end
 end
@@ -780,7 +817,7 @@ __gfx__
 076776000767767007677670076776700767767000000000044400000444e4400444e4400444e440000ffa00000ffa00000ffa00000000000000022222200000
 000000000000000000000000000000000000000000000000044e4400044e4440044e4440044e444000fcfc0000fcfc0000fcfc00000000000000000000000000
 00000000000000000000000000000000000000000000e4400444e4400444e4400444e4400444e440000ccc00000ccc00000ccc00000000000000000000000000
-0000000000000000000000000000000000000000004e4400004e440000000000004e4400004e4400000404000000040000040000000000000000000000000000
+0000000000000000000000000000000000000000004e4400004e4400004e4400004e4400004e4400000404000000040000040000000000000000000000000000
 6ddddddddddddd665555555005555555b00000006050060550600506060000600000000000000000000000000000000000000000000000000000000000000000
 6d44444544444d6655555550055555550b0000000500005005000050050000500000000000000000000000000000000005555555555555500000088888800000
 6d4ccc454ccc4d66555555500555555500b000000500005005000050050000500000000000000000000000000000000005555555555555500008867676788000
