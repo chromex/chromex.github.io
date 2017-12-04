@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=51
+	build=52
 	
 	debug=false
 	t=0
@@ -58,7 +58,7 @@ function _init()
 	
 	-- !!!debug tool!!!
 	--skip_to(3,180,40)
-	skip_to(4,2000,300)
+	skip_to(4,6000,300)
 	-- !!!debug tool!!!
 end
 
@@ -240,7 +240,7 @@ function go_phase(p)
  	tipx=20
  	e_adults=false
  	cdelta=75
- 	add_upgrade("hire chemist",600,10)
+ 	add_upgrade("hire the chemist",600,10)
  elseif p==28 then
 		e_chemist=true
  	tip="...researching..."
@@ -277,6 +277,18 @@ function go_phase(p)
  	tip="the other other white meat"
  	tipx=12
  	e_convert=true
+ elseif p==35 then
+ 	newsmsg="mnn: mallowcaust unstoppable"
+ 	tip=""
+ elseif p==36 then
+ 	newsmsg="mnn: mallow mallow mallow mallow"
+ 	add_upgrade("convert earth",0,14)
+ elseif p==37 then
+ 	e_usecomp=false
+ 	e_fadeout=true
+ 	fadecount=0
+ elseif p==38 then
+ 	state=2
 	end
 end
 
@@ -448,6 +460,14 @@ function updategame()
  	if money>=400 then
  		go_phase(33)
  	end
+ elseif phase==34 then
+ 	if cdelta>80 then
+ 		go_phase(35)
+ 	end
+ elseif phase==35 then
+ 	if cdelta>200 then
+ 		go_phase(36)
+ 	end
 	end
 end
 
@@ -576,6 +596,50 @@ function drawgame()
 	end
 	
 	draw_upgrades()
+	
+	if e_fadeout then
+		fadecount+=1
+		if fadecount<30 then
+		elseif fadecount<75 then
+ 		pal(1,0,1)
+ 		pal(2,0,1)
+ 		pal(4,0,1)
+ 		pal(5,0,1)
+ 		
+ 		pal(3,5,1)
+ 		pal(6,5,1)
+ 		pal(8,5,1)
+ 		pal(9,5,1)
+ 		pal(13,5,1)
+ 		
+ 		pal(7,6,1)
+ 		pal(10,6,1)
+ 		pal(11,6,1)
+ 		pal(12,6,1)
+ 		pal(14,6,1)
+ 		pal(15,6,1)
+ 	elseif fadecount<110 then
+ 	 pal(1,0,1)
+ 		pal(2,0,1)
+ 		pal(4,0,1)
+ 		pal(5,0,1)
+ 		
+ 		pal(3,0,1)
+ 		pal(6,0,1)
+ 		pal(8,0,1)
+ 		pal(9,0,1)
+ 		pal(13,0,1)
+ 		
+ 		pal(7,5,1)
+ 		pal(10,5,1)
+ 		pal(11,5,1)
+ 		pal(12,5,1)
+ 		pal(14,5,1)
+ 		pal(15,5,1)
+ 	else
+ 	 cls()
+ 	end
+	end
 end
 -->8
 -- util
@@ -994,6 +1058,8 @@ function purchase(id)
 		go_phase(32)
 	elseif id==13 then
 		go_phase(34)
+	elseif id==14 then
+		go_phase(37)
 	end
 end
 
@@ -1040,7 +1106,11 @@ function draw_upgrades()
 	local offset=0
 	for u in all(upgrades) do
 		print(u.n,24,28+offset,6)
-		print("$"..u.c,28+#u.n*4,28+offset,u.c>money and 2 or 11)
+		if u.c>0 then
+			print("$"..u.c,28+#u.n*4,28+offset,u.c>money and 2 or 11)
+		else
+			print("$???",28+#u.n*4,28+offset,11)
+		end
 		offset+=6
 	end
 	
