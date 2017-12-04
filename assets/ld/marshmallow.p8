@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=48
+	build=49
 	
 	debug=false
 	t=0
@@ -26,7 +26,7 @@ function _init()
 	p_l=false
 	p_r=false
 	money=0
-	phase=0
+	phase=-1
 	t_sugar=0
 	t_bone=0
 	e_table=false
@@ -572,10 +572,6 @@ function drawgame()
 	elseif phase==7 then
 		print("buy factory at computer —",12,16,15)
 	end
-	
-	--if e_chemist and phase>29 then
-		--map(0,0,0,8,16,15)
-	--end
 	
 	draw_upgrades()
 end
