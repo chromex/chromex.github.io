@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=25
+	build=26
 	
 	debug=false
 	t=0
@@ -219,9 +219,9 @@ function updategame()
 
 	-- pickups
 	if not has_sugar and not has_bone then
- 	if e_sugar and btnp(5) and chef_in(sugar_box) then
+ 	if e_sugar and btn(5) and chef_in(sugar_box) then
  		has_sugar=true
- 	elseif e_bone and btnp(5) and chef_in(bone_box) then
+ 	elseif e_bone and btn(5) and chef_in(bone_box) then
  	 has_bone=true
  	end
 	end
@@ -248,7 +248,7 @@ function updategame()
 			boiling=0
 		end
 	end
-	if btnp(5) and chef_in(cauldron_box) and t_bone>0 and t_sugar>0 and iron<iron_max then
+	if btn(5) and can_boil() then
 		boiling=min(boiling+10,10)
 	end
 	
@@ -263,7 +263,7 @@ function updategame()
 			heating=0
 		end
 	end
-	if e_iron and btnp(5) and chef_in(iron_box) and iron>0 then
+	if btn(5) and can_bake() then
 		heating=min(heating+10,10)
 	end
 	
@@ -453,6 +453,18 @@ function skip_to(p,mo,ma)
 	mallow=ma
 end
 
+function can_boil()
+	return chef_in(cauldron_box) and t_bone>0 and t_sugar>0 and iron<iron_max
+end
+
+function can_bake()
+ return e_iron and chef_in(iron_box) and iron>0
+end
+
+function can_comp()
+	return chef_in(comp_box) and e_upgrades
+end
+
 function draw_chef()
 	local t3=flr(t/3)
 	local t6=flr(t/6)
@@ -462,7 +474,10 @@ function draw_chef()
 		local sp=6
 		
 		if (chef_in(sugar_box) and e_sugar and not has_sugar)
-		or (chef_in(bone_box) and e_bone and not has_bone) then
+		or (chef_in(bone_box) and e_bone and not has_bone) 
+		or can_boil()
+		or can_bake() 
+		or can_comp() then
 			sp = t6%2==0 and 6 or 13
 		end
 		
