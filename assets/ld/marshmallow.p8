@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=43
+	build=44
 	
 	debug=false
 	t=0
@@ -204,25 +204,33 @@ function go_phase(p)
  	add_upgrade("expand oven",150,3)
  elseif p==18 then
  	newsmsg="news: mmm mallows"
+ 	arate=10
  elseif p==19 then
  	newsmsg="news: fad: mallows and chill"
  	add_upgrade("stir bot 1.0",150,4)
  	add_upgrade("bake bot 1.0",150,5)
  elseif p==20 then
+ 	arate=9
  	newsmsg="news: mallows for breakfast?"
  elseif p==21 then
+ 	arate=8
  	add_upgrade("global ads",200,6)
  elseif p==22 then
+ 	arate=7
  	newsmsg="news: mallow-mania hits high"
  elseif p==23 then
  	add_upgrade("add dopamine",500,7)
+ 	arate=6
  elseif p==24 then
  	newsmsg="news: mallows addictive?"
+ 	arate=4
  elseif p==25 then
  	add_upgrade("faster robots",500,8)
  	add_upgrade("embiggen oven",800,9)
+ 	arate=3
  elseif p==26 then
  	newsmsg="news: mallows un-healthy?"
+ 	arate=1
 	end
 end
 
