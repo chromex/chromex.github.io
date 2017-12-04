@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=31
+	build=32
 	
 	debug=false
 	t=0
@@ -41,6 +41,7 @@ function _init()
  newsmsg=""
  e_leftroom=false
  e_rightroom=false
+ cost=1
 	
 	--chef
 	cx=124
@@ -51,7 +52,7 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(0,50,20)
+	skip_to(0,100,20)
 	-- !!!debug tool!!!
 end
 
@@ -181,7 +182,17 @@ function go_phase(p)
  	tip="buy with —"
  	tipx=44
  elseif p==13 then
+ 	newsmsg="news: mechanical keyboards rule"
+ 	tip=""
+ elseif p==14 then
  	newsmsg="news: craft mallow fad grows"
+ 	cdelta=75
+ elseif p==15 then
+ 	add_upgrade("local ad",100,2)
+ 	tip="time to grow?"
+ 	tipx=36
+ elseif p==16 then
+ 	newsmsg="news: record mallow demand"
  	tip=""
 	end
 end
@@ -305,6 +316,14 @@ function updategame()
 	elseif phase==12 then
 		if robots[1].e==true or robots[2].e==true then
 			go_phase(13)
+		end
+	elseif phase==13 then
+		if robots[1].e==true and robots[2].e==true then
+			go_phase(14)
+		end
+	elseif phase==14 then
+		if money>=100 then
+			go_phase(15)
 		end
 	end
 end
@@ -595,16 +614,17 @@ crate_locs={
 -- customers
 
 customers={}
-cdelta=0
+cdelta=150
+ctime=0
 
 function add_customer()
-	if cdelta==0 and mallow>5 then
+	if ctime==0 and mallow>5 then
 		local col=flr(rnd(2))%2==0 and 12 or 14
 		add(customers,{x=192,p=40,r=false,c=col})
-		cdelta=150
+		ctime=cdelta
 	end
 	
-	if cdelta>0 then cdelta-=1 end
+	if ctime>0 then ctime-=1 end
 end
 
 function update_customers()
@@ -620,7 +640,7 @@ function update_customers()
  		 	c.p-=1
  		 	if c.p%8==0 then
   		 	mallow-=1
-  		 	money+=1
+  		 	money+=cost
  		 	end
 		 	end
 		 else
@@ -676,32 +696,37 @@ function purchase(id)
 		enable_bot(1)
 	elseif id==1 then
 		enable_bot(2)
+	elseif id==2 then
+		cdelta=50
+		go_phase(16)
 	end
 end
 
 function update_upgrades()
  if not e_usecomp then return end
  
- if btnp(4) or #upgrades==0 then
+ if btnp(4) then
  	e_usecomp=false
  	comp_row=1
  end
  
-	local u = upgrades[comp_row]
- 
- if btnp(5) and u.c<=money then
- 	purchase(u.i)
- 	money-=u.c
- 	del(upgrades,u)
- else
- 	if btnp(2) then
-  	comp_row-=1	
-  elseif btnp(3) then
-  	comp_row+=1
+ if #upgrades>0 then
+ 	local u = upgrades[comp_row]
+  
+  if btnp(5) and u.c<=money then
+  	purchase(u.i)
+  	money-=u.c
+  	del(upgrades,u)
+  else
+  	if btnp(2) then
+   	comp_row-=1	
+   elseif btnp(3) then
+   	comp_row+=1
+   end
   end
- end
  
- comp_row=min(#upgrades,max(1,comp_row))
+	 comp_row=min(#upgrades,max(1,comp_row))
+	end
 end
 
 function draw_upgrades()
@@ -714,9 +739,11 @@ function draw_upgrades()
  
  map(112,0,0,0,16,16)
  
- if t8%2==0 then
-	 spr(36,20,22+comp_row*6)
-	end
+	if #upgrades>0 then
+  if t8%2==0 then
+ 	 spr(36,20,22+comp_row*6)
+ 	end
+ end
 	
 	local offset=0
 	for u in all(upgrades) do
