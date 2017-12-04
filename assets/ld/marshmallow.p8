@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=33
+	build=34
 	
 	debug=false
 	t=0
@@ -42,6 +42,7 @@ function _init()
  e_leftroom=false
  e_rightroom=false
  cost=1
+ oven_output=1
 	
 	--chef
 	cx=124
@@ -194,6 +195,15 @@ function go_phase(p)
  elseif p==16 then
  	newsmsg="news: record mallow demand"
  	tip=""
+ elseif p==17 then
+ 	newsmsg="news: epic birthday eclipse"
+ 	add_upgrade("expand oven",150,3)
+ elseif p==18 then
+ 	newsmsg="news: mmm mallows"
+ elseif p==19 then
+ 	newsmsg="news: fad: mallows and chill"
+ 	add_upgrade("stir bot 1.0",150,4)
+ 	add_upgrade("bake bot 1.0",150,5)
 	end
 end
 
@@ -246,7 +256,7 @@ function updategame()
 		heating-=1
 		if t%5==0 then
 			iron=max(iron-1,0)
-			mallow+=1
+			mallow+=oven_output
 		end
 		if iron==0 then
 			heating=0
@@ -324,6 +334,14 @@ function updategame()
 	elseif phase==14 then
 		if money>=80 then
 			go_phase(15)
+		end
+	elseif phase==16 then
+		if money>=75 then
+			go_phase(17)
+		end
+	elseif phase==18 then
+		if money>=100 then
+			go_phase(18)
 		end
 	end
 end
@@ -654,7 +672,7 @@ function add_customer()
  		add(customers,
  		 {
  		 	x=192+flr(rnd(15)),
- 		 	p=48,
+ 		 	p=56,
  		 	r=false,
  		 	c=0,
  		 	y=flr(rnd(7)),
@@ -746,6 +764,9 @@ function purchase(id)
 	elseif id==2 then
 		e_adults=true
 		go_phase(16)
+	elseif id==3 then
+		oven_output=2
+		go_phase(18)
 	end
 end
 
