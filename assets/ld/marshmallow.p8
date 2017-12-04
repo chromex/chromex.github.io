@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=38
+	build=39
 	
 	debug=false
 	t=0
@@ -43,6 +43,7 @@ function _init()
  e_rightroom=false
  cost=1
  oven_output=1
+ robot_spd=0.02
 	
 	--chef
 	cx=124
@@ -54,7 +55,7 @@ function _init()
 	
 	-- !!!debug tool!!!
 	skip_to(3,180,40)
-	--skip_to(4,630,400)
+	--skip_to(4,1000,200)
 	-- !!!debug tool!!!
 end
 
@@ -192,7 +193,7 @@ function go_phase(p)
  	newsmsg="news: craft mallow fad grows"
  	cdelta=75
  elseif p==15 then
- 	add_upgrade("local ads",80,2)
+ 	add_upgrade("national ads",80,2)
  	tip="time to grow?"
  	tipx=36
  elseif p==16 then
@@ -210,13 +211,18 @@ function go_phase(p)
  elseif p==20 then
  	newsmsg="news: mallows for breakfast?"
  elseif p==21 then
- 	add_upgrade("national ads",200,6)
+ 	add_upgrade("global ads",200,6)
  elseif p==22 then
  	newsmsg="news: mallow-mania hits high"
  elseif p==23 then
  	add_upgrade("add dopamine",500,7)
  elseif p==24 then
- 	newsmsg="news: mallows addicting?"
+ 	newsmsg="news: mallows addictive?"
+ elseif p==25 then
+ 	add_upgrade("faster robots",600,8)
+ 	add_upgrade("embiggen oven",1000,9)
+ elseif p==26 then
+ 	newsmsg="news: mallows un-healthy?"
 	end
 end
 
@@ -367,6 +373,10 @@ function updategame()
  elseif phase==22 then
  	if money>=250 then
  		go_phase(23)
+ 	end
+ elseif phase==24 then
+ 	if money>=300 then
+ 		go_phase(25)
  	end
 	end
 end
@@ -658,9 +668,14 @@ function draw_mallows()
 	local c
 	while i<=#crate_locs do
 		c = crate_locs[i]
-		c[3] = c[3] or (m>0)
-		if c[3] then 
+		if m>0 then
+			c[3] = 30
+		end
+		c[3] -= 1
+		if c[3]>0 then 
 			draw_mallow(c[1],c[2],m)
+		else
+			break
 		end
 		m=max(m-20,0)
 		i+=1
@@ -668,33 +683,33 @@ function draw_mallows()
 end
 
 crate_locs={
- {124,89,false},
- {73,95,false},
- {83,95,false},
- {93,95,false},
- {103,95,false},
- {113,95,false},
- {175,95,false},
- {165,95,false},
- {155,95,false},
- {145,95,false},
- {135,95,false},
- {73,85,false},
- {83,85,false},
- {93,85,false},
- {103,85,false},
- {175,85,false},
- {165,85,false},
- {155,85,false},
- {145,85,false},
- {73,75,false},
- {83,75,false},
- {93,75,false},
- {103,75,false},
- {175,75,false},
- {165,75,false},
- {155,75,false},
- {145,75,false}
+ {124,89,0},
+ {73,95,0},
+ {83,95,0},
+ {93,95,0},
+ {103,95,0},
+ {113,95,0},
+ {175,95,0},
+ {165,95,0},
+ {155,95,0},
+ {145,95,0},
+ {135,95,0},
+ {73,85,0},
+ {83,85,0},
+ {93,85,0},
+ {103,85,0},
+ {175,85,0},
+ {165,85,0},
+ {155,85,0},
+ {145,85,0},
+ {73,75,0},
+ {83,75,0},
+ {93,75,0},
+ {103,75,0},
+ {175,75,0},
+ {165,75,0},
+ {155,75,0},
+ {145,75,0}
 }
 -->8
 -- customers
@@ -841,6 +856,13 @@ function purchase(id)
 		cdelta=20
 		adelta=25
 		go_phase(24)
+	elseif id==8 then
+		robot_spd*=2
+		oven_output+=1
+		go_phase(26)
+	elseif id==9 then
+		oven_output+=1
+		go_phase(26)
 	end
 end
 
@@ -958,10 +980,10 @@ function exe_delivery(bot,spd,item,do_work)
 end
 
 function update_robots()
-	if robots[1].e and exe_delivery(robots[1],0.02,25,t_sugar==0) then
+	if robots[1].e and exe_delivery(robots[1],robot_spd,25,t_sugar==0) then
 		add_sugar(20)
 	end
-	if robots[2].e and exe_delivery(robots[2],0.02,5,t_bone==0) then
+	if robots[2].e and exe_delivery(robots[2],robot_spd,5,t_bone==0) then
 	 add_bone(20)
 	end
 	
