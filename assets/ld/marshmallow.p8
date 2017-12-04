@@ -51,7 +51,7 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(2,50,20)
+	skip_to(0,50,20)
 	-- !!!debug tool!!!
 end
 
