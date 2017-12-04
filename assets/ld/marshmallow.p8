@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=53
+	build=54
 	
 	debug=false
 	t=0
@@ -1225,6 +1225,16 @@ end
 _starcolor=0
 _mallowy=64
 _time=0
+_msg=""
+_msgx=0
+_msgtime=0
+_msgcolor=0
+
+function settext(msg)
+	_msg=msg
+	_msgx=64-(#msg*2)
+	_msgtime=150
+end
 
 function updateclose()
 		_time+=1
@@ -1243,6 +1253,33 @@ function updateclose()
 				_mallowy-=1
 			end
 		end
+		
+		if _time==160 then
+			settext("you've done it")
+		elseif _time==340 then
+			settext("but...")
+		elseif _time==520 then
+			--pop
+			settext("loneliness always wins")
+		elseif _time==700 then
+			settext("mallow mallow mallow mallow")
+		end
+		
+		if _msgtime>120 then
+			_msgcolor=5
+		elseif _msgtime>90 then
+			_msgcolor=6
+		elseif _msgtime>60 then
+			_msgcolor=14
+		elseif _msgtime>30 then
+			_msgcolor=6
+		elseif _msgtime>0 then
+			_msgcolor=5
+		else
+			_msgcolor=0
+			_msg=""
+		end
+		_msgtime=max(_msgtime-1,0)
 end
 
 function drawclose()
@@ -1257,6 +1294,8 @@ function drawclose()
 	local t6=flr(t/6)	
 	spr(t6%2==0 and 6 or 13,45,85+_mallowy)
 	draw_chemist(75,99+_mallowy)
+	
+	print(_msg,_msgx,60,_msgcolor)
  -- fade in: you've done it
  -- fade out text
  -- fade in: but...
