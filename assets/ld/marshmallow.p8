@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=35
+	build=37
 	
 	debug=false
 	t=0
@@ -53,7 +53,7 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(3,180,20)
+	skip_to(3,180,40)
 	-- !!!debug tool!!!
 end
 
@@ -521,7 +521,7 @@ function boil()
 end
 
 function allow_bake()
-	return iron>0
+	return iron>0 and mallow<540
 end
 
 function can_bake()
@@ -621,34 +621,54 @@ end
 
 function draw_mallow(x,y,f)
 	spr(12,x,y)
-	spr(16+flr(min(f,20)/5),x,y)
+	if f>0 then
+		spr(16+flr(min(f,20)/5),x,y)
+	end
 end
 
 function draw_mallows()
 	local m=mallow
 	local i=1
-	while m>0 do
-		draw_mallow(crate_locs[i],crate_locs[i+1],m)
-		m-=20
-		i+=2
-		if i>#crate_locs then
-			break
+	local c
+	while i<=#crate_locs do
+		c = crate_locs[i]
+		c[3] = c[3] or (m>0)
+		if c[3] then 
+			draw_mallow(c[1],c[2],m)
 		end
+		m=max(m-20,0)
+		i+=1
 	end
 end
 
 crate_locs={
- 124,89,
- 73,95,
- 83,95,
- 93,95,
- 103,95,
- 113,95,
- 175,95,
- 165,95,
- 155,95,
- 145,95,
- 135,95
+ {124,89,false},
+ {73,95,false},
+ {83,95,false},
+ {93,95,false},
+ {103,95,false},
+ {113,95,false},
+ {175,95,false},
+ {165,95,false},
+ {155,95,false},
+ {145,95,false},
+ {135,95,false},
+ {73,85,false},
+ {83,85,false},
+ {93,85,false},
+ {103,85,false},
+ {175,85,false},
+ {165,85,false},
+ {155,85,false},
+ {145,85,false},
+ {73,75,false},
+ {83,75,false},
+ {93,75,false},
+ {103,75,false},
+ {175,75,false},
+ {165,75,false},
+ {155,75,false},
+ {145,75,false}
 }
 -->8
 -- customers
@@ -821,9 +841,6 @@ function draw_upgrades()
  if not e_usecomp then return end
 
 	local t8=flr(t/8)
-
- --todo: perf sucks
-	--draw_grayscale()
  
  map(112,0,0,0,16,16)
  
@@ -843,23 +860,6 @@ function draw_upgrades()
 	print("press 'z' to exit",41,87,14)
 end
 
-function draw_grayscale()
- local x
- local y
- local c
- for x=0,127 do
- 	for y=0,127 do
- 		c = pget(x,y)
- 		if c==5 or c==4 or c==2 or c==1 then
- 			pset(x,y,0)
- 		elseif c==6 or c==13 or c==9 or c==8 or c==3 then
- 		 pset(x,y,5)
- 		elseif c==15 or c==14 or c==12 or c==11 or c==10 or c==7 then
- 		 pset(x,y,6)
- 		end
- 	end
- end
-end
 -->8
 -- automatons
 
@@ -939,7 +939,7 @@ function update_robots()
 	end
 	
 	if robots[4].e then
-		robots[4].idle = iron==0
+		robots[4].idle = not allow_bake()
 		if not robots[4].idle then
 			bake()
 		end
