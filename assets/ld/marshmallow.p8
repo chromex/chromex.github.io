@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=34
+	build=35
 	
 	debug=false
 	t=0
@@ -53,7 +53,7 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(0,180,20)
+	skip_to(3,180,20)
 	-- !!!debug tool!!!
 end
 
@@ -189,7 +189,7 @@ function go_phase(p)
  	newsmsg="news: craft mallow fad grows"
  	cdelta=75
  elseif p==15 then
- 	add_upgrade("local ad",80,2)
+ 	add_upgrade("local ads",80,2)
  	tip="time to grow?"
  	tipx=36
  elseif p==16 then
@@ -214,8 +214,6 @@ function updategame()
  	move_chef()
  end
  
- update_robots()
-
 	-- pickups
 	if not has_sugar and not has_bone then
  	if e_sugar and btn(5) and chef_in(sugar_box) then
@@ -248,7 +246,7 @@ function updategame()
 		end
 	end
 	if btn(5) and can_boil() then
-		boiling=min(boiling+10,10)
+		boil()
 	end
 	
 	-- baking
@@ -263,8 +261,10 @@ function updategame()
 		end
 	end
 	if btn(5) and can_bake() then
-		heating=min(heating+10,10)
+		bake()
 	end
+	
+	update_robots()
 	
 	if btn(5) and can_comp() and phase>10 then
 		e_usecomp=true
@@ -341,7 +341,7 @@ function updategame()
 		end
 	elseif phase==18 then
 		if money>=100 then
-			go_phase(18)
+			go_phase(19)
 		end
 	end
 end
@@ -508,12 +508,28 @@ function add_bone(amt)
 	t_bone=min(t_bone+amt,20)
 end
 
+function allow_boil()
+	return t_bone>0 and t_sugar>0 and iron<iron_max
+end
+
 function can_boil()
-	return chef_in(cauldron_box) and t_bone>0 and t_sugar>0 and iron<iron_max
+	return chef_in(cauldron_box) and allow_boil()
+end
+
+function boil()
+ boiling=min(boiling+10,10)
+end
+
+function allow_bake()
+	return iron>0
 end
 
 function can_bake()
- return e_iron and chef_in(iron_box) and iron>0
+ return e_iron and chef_in(iron_box) and allow_bake()
+end
+
+function bake()
+ heating=min(heating+10,10)
 end
 
 function can_comp()
@@ -767,6 +783,10 @@ function purchase(id)
 	elseif id==3 then
 		oven_output=2
 		go_phase(18)
+	elseif id==4 then
+		enable_bot(3)
+	elseif id==5 then
+		enable_bot(4)
 	end
 end
 
@@ -856,11 +876,21 @@ function draw_robot(x,y,i,item)
 	end
 end
 
+srobot_anim={56,58,57,58}
+function draw_srobot(x,y,i)
+	local t4=flr(t/4)
+	if i then
+ 	spr(40+t4%4,x,y)
+ else
+	 spr(srobot_anim[1+t4%4],x,y)
+	end	
+end
+
 robots={
  {e=false,x=0,y=0,sx=88,sy=40,tx=117,ty=55,s=0,idle=true,item=0},
  {e=false,x=0,y=0,sx=160,sy=40,tx=131,ty=55,s=0,idle=true,item=0},
- {e=false,x=0,y=0},
- {e=false,x=0,y=0},
+ {e=false,x=134,y=61,idle=true},
+ {e=false,x=135,y=78,idle=true},
 }
 
 function enable_bot(b)
@@ -894,20 +924,37 @@ function exe_delivery(bot,spd,item,do_work)
 end
 
 function update_robots()
-	local sugarbot=robots[1]
-	
 	if robots[1].e and exe_delivery(robots[1],0.02,25,t_sugar==0) then
 		add_sugar(20)
 	end
 	if robots[2].e and exe_delivery(robots[2],0.02,5,t_bone==0) then
 	 add_bone(20)
 	end
+	
+	if robots[3].e then
+		robots[3].idle = not allow_boil()	
+		if not robots[3].idle then
+			boil()
+		end
+	end
+	
+	if robots[4].e then
+		robots[4].idle = iron==0
+		if not robots[4].idle then
+			bake()
+		end
+	end
 end
 
 function draw_robots()
-	for r in all(robots) do
+	for i=1,#robots do
+		local r=robots[i]
 		if r.e==true then
-			draw_robot(r.x,r.y,r.idle,r.item)
+			if i<3 then
+				draw_robot(r.x,r.y,r.idle,r.item)
+			else
+				draw_srobot(r.x,r.y,r.idle)
+			end
 		end
 	end
 end
@@ -936,13 +983,13 @@ __gfx__
 6d4cc44544cc4d665555555005555555000000000065560000655600006556005066660550c66c05506666055066660505555555555555500028867766788200
 6d4ccc454ccc4d66555555500555555500000000000000000000000000000000600000066000000660c00c066000000606666666666666600002e876768e2000
 6d44444544444d6655555550055555550000000000000000000000000000000000000000000000000000000000c00c0006666555555666600002ee8778ee2000
-5555555566666666666666600666666611111111bfbbbbb355555555555555550000000000000000000000000000000006666444444666600002eeee7eee2000
-5555555566666666666666600666666611111111bbb3bb3b55555555555555550000000000000000000000000000000006666666666666600002eee7eeee2000
-5555555566666666666666600666666611111111bb3bbb3b5555555555555555000000000000000000000000000000000661d1d1d1d1d6600002eee7eeee2000
-5555555566666666666666600666666611111111fb3bfbbb5555555555555555000000000000000000000000000000000661d1d1d1d1d66000042ee7eee24000
-5555555566666666666666600666666611111111bbbbbb3b555555555555555500000000000000000000000000000000066d1d1d1d1d16600009422272249000
-5555555566666666666666600666666611111111bb3bb3bb555555555555555500000000000000000000000000000000066d1d1d1d1d16600000944744490000
-5555555566666666666666600666666611111111b3bbb3bf55555055505555550000000000000000000000000000000006666666666666600000099799900000
+5555555566666666666666600666666611111111bfbbbbb355555555555555550600000005000000000000000000000006666444444666600002eeee7eee2000
+5555555566666666666666600666666611111111bbb3bb3b55555555555555550050000000500000065000000000000006666666666666600002eee7eeee2000
+5555555566666666666666600666666611111111bb3bbb3b5555555555555555050500000605000000050000000000000661d1d1d1d1d6600002eee7eeee2000
+5555555566666666666666600666666611111111fb3bfbbb55555555555555550000e66e0000e66e00009669000000000661d1d1d1d1d66000042ee7eee24000
+5555555566666666666666600666666611111111bbbbbb3b555555555555555506056666050566660005666600000000066d1d1d1d1d16600009422272249000
+5555555566666666666666600666666611111111bb3bb3bb555555555555555500506556005065560650655600000000066d1d1d1d1d16600000944744490000
+5555555566666666666666600666666611111111b3bbb3bf55555055505555550500000006000000000000000000000006666666666666600000099799900000
 5555555566666666666666600666666611111111b3bfbbbb55555055505555550000000000000000000000000000000006666666666666600000000070000000
 09a9000009a9000009a9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 aaaa0000aaaa0000aaaa000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
