@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=29
+	build=30
 	
 	debug=false
 	t=0
@@ -211,7 +211,7 @@ function updategame()
 	end
 	if has_bone and chef_in(table_box) then
 		has_bone=false
-		t_bone=min(t_bone+20,20)
+		add_bone(2)
 	end
 	
 	-- boiling
@@ -453,11 +453,16 @@ end
 
 function lerp(x,y,s)
  if s>0.95 then s=1 end
+ if s<0.05 then s=0 end
 	return x+(y-x)*s
 end
 
 function add_sugar(amt)
 	t_sugar=min(t_sugar+amt,20)
+end
+
+function add_bone(amt)
+	t_bone=min(t_bone+amt,20)
 end
 
 function can_boil()
@@ -669,6 +674,8 @@ end
 function purchase(id)
 	if id==0 then
 		enable_bot(1)
+	elseif id==1 then
+		enable_bot(2)
 	end
 end
 
@@ -755,9 +762,8 @@ function draw_robot(x,y,i,item)
 end
 
 robots={
- {e=false,x=88,y=40,spd=0.02,s=0,idle=true,item=0},
- {e=false,x=0,y=0},
- {e=false,x=0,y=0},
+ {e=false,x=0,y=0,sx=88,sy=40,tx=117,ty=55,s=0,idle=true,item=0},
+ {e=false,x=0,y=0,sx=158,sy=40,tx=131,ty=55,s=0,idle=true,item=0},
  {e=false,x=0,y=0},
  {e=false,x=0,y=0},
 }
@@ -766,31 +772,40 @@ function enable_bot(b)
 	robots[b].e = true
 end
 
+function exe_delivery(bot,spd,item,do_work)
+	local ret=false
+	if bot.s==0 and bot.item==0 and do_work then
+		bot.item=item
+		bot.idle=false
+	elseif not bot.idle then
+		if bot.item!=0 then
+			bot.s=min(bot.s+spd,1)
+		else
+			bot.s=max(bot.s-spd,0)
+		end
+
+		bot.x=lerp(bot.sx,bot.tx,bot.s)
+		bot.y=lerp(bot.sy,bot.ty,bot.s)
+	end
+	
+	if bot.item!=0 and bot.s==1 then
+		bot.item=0
+		ret = true
+	elseif bot.item==0 and bot.s==0 then
+	 bot.idle=true
+	end
+	
+	return ret
+end
+
 function update_robots()
 	local sugarbot=robots[1]
 	
-	if sugarbot.e then
-		-- todo only carry if empty table
-		if sugarbot.x==88 and sugarbot.y==40 and sugarbot.item==0 and t_sugar==0 then
-			sugarbot.item=25
-			sugarbot.idle=false
-		elseif not sugarbot.idle then
-			if sugarbot.item!=0 then
- 			sugarbot.s=min(sugarbot.s+sugarbot.spd,1)
- 		else
- 			sugarbot.s=max(sugarbot.s-sugarbot.spd,0)
- 		end
- 
- 		sugarbot.x=lerp(88,117,sugarbot.s)
- 		sugarbot.y=lerp(40,55,sugarbot.s)
- 	end
- 	
-		if sugarbot.item!=0 and sugarbot.s==1 then
-			sugarbot.item=0
-			add_sugar(20)
-		elseif sugarbot.item==0 and sugarbot.s==0 then
-		 sugarbot.idle=true
-		end
+	if robots[1].e and exe_delivery(robots[1],0.02,25,t_sugar==0) then
+		add_sugar(20)
+	end
+	if robots[2].e and exe_delivery(robots[2],0.02,5,t_bone==0) then
+	 add_bone(20)
 	end
 end
 
