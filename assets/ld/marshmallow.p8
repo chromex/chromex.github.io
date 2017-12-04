@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=50
+	build=51
 	
 	debug=false
 	t=0
@@ -57,8 +57,8 @@ function _init()
 	has_bone=false
 	
 	-- !!!debug tool!!!
-	skip_to(3,180,40)
-	--skip_to(4,2000,300)
+	--skip_to(3,180,40)
+	skip_to(4,2000,300)
 	-- !!!debug tool!!!
 end
 
@@ -86,7 +86,7 @@ function _draw()
 		rectfill(0,128-13,127,127,8)
 		line(0,128-14,127,128-14,5)
 		print("p:"..phase.." s:"..state.." m:"..mallow.." c:"..#customers,1,128-6,2)
-		print("$:"..money.." tb:"..t_bone.." ts:"..t_sugar.." i:"..iron,1,128-12,2)
+		print("$:"..money.." tb:"..t_bone.." ts:"..t_sugar.." i:"..iron.." delta:"..cdelta,1,128-12,2)
 	end
 end
 -->8
@@ -251,13 +251,13 @@ function go_phase(p)
  	add_upgrade("add cocaine",40,11)
  elseif p==30 then
  	tip="dope. let them eat coke."
- 	tipx=8
+ 	tipx=16
  	e_adults=true
 		cdelta=20
 		adelta=25
  	e_snow=true
  	cost=2
- 	newsmsg="news: mallows better than ever"
+ 	newsmsg="news: mallows back on the table"
  elseif p==31 then
  	tip="hehe"
  	tipx=56
@@ -271,7 +271,7 @@ function go_phase(p)
  	newsmsg="mnn: mallows are life"
  	tip=""
  	tipx=30
- 	add_upgrade("mallow toxin",800,13)
+ 	add_upgrade("mallow toxin",1000,13)
  elseif p==34 then
  	newsmsg="mnn: you are what you eat"
  	tip="the other other white meat"
@@ -433,7 +433,7 @@ function updategame()
  		go_phase(25)
  	end
  elseif phase==26 then
- 	if mallow>240 and money>500 then
+ 	if money>500 then
  		go_phase(27)
  	end
  elseif phase==28 then
@@ -802,6 +802,7 @@ customers={}
 cdelta=150
 ctime=0
 cstop=126
+e_children=true
 --adults
 adelta=75
 atime=0
@@ -810,7 +811,7 @@ arate=1000
 
 function add_customer()
 	if mallow>5 then
- 	if ctime==0 then
+ 	if ctime==0 and e_children then
  		local col=flr(rnd(2))%2==0 and 12 or 14
  		add(customers,
  			{
@@ -825,6 +826,13 @@ function add_customer()
  		ctime=cdelta
  		if atime==0 then
  			atime+=flr(adelta/2)
+ 		end
+ 		
+ 		if e_convert then
+ 			cdelta+=flr(cdelta/10)+1
+ 			if cdelta>200 then
+ 				e_children=false
+ 			end
  		end
  	end
  	
@@ -848,6 +856,13 @@ function add_customer()
  		 	fat=r2==0
  		 })
  		atime=adelta
+ 		
+ 		if e_convert then
+ 			adelta+=flr(adelta/10)+1
+ 			if adelta>200 then
+ 				e_adults=false
+ 			end
+ 		end
  	end
 	end
 	
