@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=39
+	build=40
 	
 	debug=false
 	t=0
@@ -219,8 +219,8 @@ function go_phase(p)
  elseif p==24 then
  	newsmsg="news: mallows addictive?"
  elseif p==25 then
- 	add_upgrade("faster robots",600,8)
- 	add_upgrade("embiggen oven",1000,9)
+ 	add_upgrade("faster robots",500,8)
+ 	add_upgrade("embiggen oven",800,9)
  elseif p==26 then
  	newsmsg="news: mallows un-healthy?"
 	end
@@ -371,11 +371,11 @@ function updategame()
 			go_phase(21)
 		end
  elseif phase==22 then
- 	if money>=250 then
+ 	if money>=150 then
  		go_phase(23)
  	end
  elseif phase==24 then
- 	if money>=300 then
+ 	if money>=250 then
  		go_phase(25)
  	end
 	end
