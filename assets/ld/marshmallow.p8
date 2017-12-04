@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=37
+	build=38
 	
 	debug=false
 	t=0
@@ -54,6 +54,7 @@ function _init()
 	
 	-- !!!debug tool!!!
 	skip_to(3,180,40)
+	--skip_to(4,630,400)
 	-- !!!debug tool!!!
 end
 
@@ -118,6 +119,8 @@ iron_colors={1,5,6,6,7}
 comp_box={74,42,85,54}
 
 function go_phase(p)
+	if p<=phase then return end
+	
 	phase=p
 	if p==0 then
 		mlayer=1
@@ -204,6 +207,16 @@ function go_phase(p)
  	newsmsg="news: fad: mallows and chill"
  	add_upgrade("stir bot 1.0",150,4)
  	add_upgrade("bake bot 1.0",150,5)
+ elseif p==20 then
+ 	newsmsg="news: mallows for breakfast?"
+ elseif p==21 then
+ 	add_upgrade("national ads",200,6)
+ elseif p==22 then
+ 	newsmsg="news: mallow-mania hits high"
+ elseif p==23 then
+ 	add_upgrade("add dopamine",500,7)
+ elseif p==24 then
+ 	newsmsg="news: mallows addicting?"
 	end
 end
 
@@ -343,6 +356,18 @@ function updategame()
 		if money>=100 then
 			go_phase(19)
 		end
+	elseif phase==19 then
+		if robots[3].e and robots[4].e then
+			go_phase(20)
+		end
+	elseif phase==20 then
+		if money>=100 then
+			go_phase(21)
+		end
+ elseif phase==22 then
+ 	if money>=250 then
+ 		go_phase(23)
+ 	end
 	end
 end
 
@@ -483,6 +508,7 @@ function skip_to(p,mo,ma)
 	if     p==1 then target=8
 	elseif p==2 then target=10
 	elseif p==3 then target=15
+	elseif p==4 then target=20
 	end
 	
 	local i
@@ -807,6 +833,14 @@ function purchase(id)
 		enable_bot(3)
 	elseif id==5 then
 		enable_bot(4)
+	elseif id==6 then
+		cdelta=30
+		adelta=40
+		go_phase(22)
+	elseif id==7 then
+		cdelta=20
+		adelta=25
+		go_phase(24)
 	end
 end
 
