@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=62
+	build=63
 	
 	debug=false
 	t=0
@@ -180,7 +180,7 @@ sugar_box={86,32,98,48}
 bone_box={158,32,170,48}
 table_box={112,46,144,64}
 cauldron_box={116,56,140,71}
-iron_box={116,71,140,88}
+iron_box={112,71,144,88}
 iron_max=20
 iron_colors={1,5,6,6,7}
 comp_box={74,42,85,54}
