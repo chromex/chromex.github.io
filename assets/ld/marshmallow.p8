@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=58
+	build=59
 	
 	debug=false
 	t=0
@@ -92,6 +92,9 @@ function _draw()
 		print("p:"..phase.." s:"..state.." m:"..mallow.." c:"..#customers,1,128-6,2)
 		print("$:"..money.." tb:"..t_bone.." ts:"..t_sugar.." i:"..iron.." delta:"..cdelta,1,128-12,2)
 	end
+	
+	-- must be last thing updated
+ _prevbtn=btn(5)
 end
 -->8
 --menu
@@ -111,7 +114,7 @@ function updatemenu()
 	
 	if __mallowy==50 then
 		pal()
-		state=2
+		state=1
 		go_phase(0)
 	end
 end
@@ -359,9 +362,9 @@ function updategame()
  
 	-- pickups
 	if not has_sugar and not has_bone then
- 	if e_sugar and btn(5) and chef_in(sugar_box) then
+ 	if e_sugar and click() and chef_in(sugar_box) then
  		has_sugar=true
- 	elseif e_bone and btn(5) and chef_in(bone_box) then
+ 	elseif e_bone and click() and chef_in(bone_box) then
  	 has_bone=true
  	end
 	end
@@ -388,7 +391,7 @@ function updategame()
 			boiling=0
 		end
 	end
-	if btn(5) and can_boil() then
+	if click() and can_boil() then
 		boil()
 	end
 	
@@ -403,13 +406,13 @@ function updategame()
 			heating=0
 		end
 	end
-	if btn(5) and can_bake() then
+	if click() and can_bake() then
 		bake()
 	end
 	
 	update_robots()
 	
-	if btn(5) and can_comp() and phase>10 then
+	if click() and can_comp() and phase>10 then
 		e_usecomp=true
 	end
 	
@@ -447,7 +450,7 @@ function updategame()
 			go_phase(7)
 		end
 	elseif phase==7 then
-		if btnp(5) and chef_in(comp_box) then
+		if click() and chef_in(comp_box) then
 			go_phase(8)
 		end
 	elseif phase==8 then
@@ -925,6 +928,17 @@ crate_locs={
  {155,75,0},
  {145,75,0}
 }
+
+_prevbtn=nil
+function click()
+	local ret=false
+ if btn(5) then
+  ret=
+  	_prevbtn==nil or 
+  	_prevbtn==false
+ end
+ return ret
+end
 -->8
 -- customers
 
@@ -1350,7 +1364,7 @@ function updateclose()
 		elseif _time==2140 then
 			settext("ryder")
 		elseif _time==2320 then
-			settext("sylvr")
+			settext("silvr")
 		elseif _time==2500 then
 			settext("pyrakra")
 		end
