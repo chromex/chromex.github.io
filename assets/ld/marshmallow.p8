@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=56
+	build=57
 	
 	debug=false
 	t=0
@@ -96,8 +96,21 @@ end
 -->8
 --menu
 
+__mallowy=0
+__e_intro=false
+__fadecount=0
+
 function updatemenu()
-	if btn(5) then
+	if btnp(5) then
+		__e_intro=true
+	end
+	
+	if __e_intro and t%1==0 then
+		__mallowy+=1
+	end
+	
+	if __mallowy==50 then
+		pal()
 		state=1
 		go_phase(0)
 	end
@@ -105,13 +118,56 @@ end
 
 function drawmenu()
 	cls(14)
-	--todo distopian, happy start screen
-	print("happy happy marshmallow factory", 3, 50, 7)	
-	print("press 'x' to start", 30, 56, 15)
-	
-	print("warn: super duper pre alpha",10,80,3)
-	
-	print("b"..build,1,128-6,2)
+	print("happy happy marshmallow factory", 3, 50, 10)	
+		
+	map(16,0,0,85+__mallowy,16,16)
+
+	if not __e_intro then
+		print("press 'x' to start", 30, 56, 15)
+		print("b"..build,1,128-6,15)
+	else
+		__fadecount+=1
+		if __fadecount<20 then
+		elseif __fadecount<30 then
+ 		pal(1,0,1)
+ 		pal(2,0,1)
+ 		pal(4,0,1)
+ 		pal(5,0,1)
+ 		
+ 		pal(3,5,1)
+ 		pal(6,5,1)
+ 		pal(8,5,1)
+ 		pal(9,5,1)
+ 		pal(13,5,1)
+ 		
+ 		pal(7,6,1)
+ 		pal(10,6,1)
+ 		pal(11,6,1)
+ 		pal(12,6,1)
+ 		pal(14,6,1)
+ 		pal(15,6,1)
+ 	elseif __fadecount<40 then
+ 	 pal(1,0,1)
+ 		pal(2,0,1)
+ 		pal(4,0,1)
+ 		pal(5,0,1)
+ 		
+ 		pal(3,0,1)
+ 		pal(6,0,1)
+ 		pal(8,0,1)
+ 		pal(9,0,1)
+ 		pal(13,0,1)
+ 		
+ 		pal(7,5,1)
+ 		pal(10,5,1)
+ 		pal(11,5,1)
+ 		pal(12,5,1)
+ 		pal(14,5,1)
+ 		pal(15,5,1)
+ 	elseif __fadecount<50 then
+ 	 cls()
+ 	end
+ end
 end
 -->8
 -- game
@@ -275,7 +331,7 @@ function go_phase(p)
  	newsmsg="mnn: mallows are life"
  	tip=""
  	tipx=30
- 	add_upgrade("mallow toxin",1000,13)
+ 	add_upgrade("magic mallows",1000,13)
  elseif p==34 then
  	newsmsg="mnn: you are what you eat"
  	tip="the other other white meat"
