@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=61
+	build=62
 	
 	debug=false
 	t=0
@@ -526,7 +526,7 @@ function updategame()
  		go_phase(35)
  	end
  elseif phase==35 then
- 	if cdelta>200 then
+ 	if cdelta>170 then
  		go_phase(36)
  	end
 	end
@@ -720,6 +720,7 @@ function drawgame()
  	elseif fadecount<140 then
  	 cls()
  	else
+ 		cls()
  		state=2
  	end
 	end
@@ -991,7 +992,7 @@ function add_customer()
  		
  		if e_convert then
  			cdelta+=flr(cdelta/10)+1
- 			if cdelta>200 then
+ 			if cdelta>170 then
  				e_children=false
  			end
  		end
@@ -1020,7 +1021,7 @@ function add_customer()
  		
  		if e_convert then
  			adelta+=flr(adelta/10)+1
- 			if adelta>200 then
+ 			if adelta>170 then
  				e_adults=false
  			end
  		end
