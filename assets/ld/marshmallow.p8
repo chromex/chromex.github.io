@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=57
+	build=58
 	
 	debug=false
 	t=0
@@ -111,7 +111,7 @@ function updatemenu()
 	
 	if __mallowy==50 then
 		pal()
-		state=1
+		state=2
 		go_phase(0)
 	end
 end
@@ -1339,6 +1339,20 @@ function updateclose()
 			settext("by loren 'thechemist' hoffman")
 		elseif _time==1240 then
 			settext("thank you for playing")
+		elseif _time==1420 then
+			settext("special thanks to:")
+		elseif _time==1600 then
+			settext("crusher4")
+		elseif _time==1780 then
+			settext("haxo leilas")
+		elseif _time==1960 then
+			settext("rogar")
+		elseif _time==2140 then
+			settext("ryder")
+		elseif _time==2320 then
+			settext("sylvr")
+		elseif _time==2500 then
+			settext("pyrakra")
 		end
 		
 		if _msgtime>120 then
