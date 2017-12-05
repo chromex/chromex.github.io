@@ -4,7 +4,7 @@ __lua__
 -- happy happy marshmallow factory
 
 function _init()
-	build=59
+	build=60
 	
 	debug=false
 	t=0
@@ -656,6 +656,10 @@ function drawgame()
 		if p_r then
 			print("‘",92,9,10)
 		end
+	elseif phase==5 then
+		print("—",106,9,flr((t/4)/2)%2==0 and 10 or 14)
+	elseif phase==6 then
+		print("—",96,9,flr((t/4)/2)%2==0 and 10 or 14)
 	elseif phase==7 then
 		print("buy factory at computer —",12,16,15)
 	end
