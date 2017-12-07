@@ -1,0 +1,22 @@
+---
+layout: post
+title: The Worst Code I've Ever Written aka Happy Happy Marshmallow Factory
+categories: writing
+excerpt: Lets fix my worst code! Part 1
+---
+
+[Ludum Dare 40](https://ldjam.com/) was, as is normal, stressful. While I was trying to finish in 48 hours to qualify for the [compo](https://ldjam.com/events/ludum-dare/rules), the scope of my project and the amount of testing and polishing required was at odds with the goal. My final build was uploaded a nice 20 minutes prior to the close of the jam and in the preceding (almost) 72 hours, I believe I worked about 45-50 of them. During this time, I revisited the story progression three times, published 63 builds, collected bugs and feedback from 10 different testers, and fell pretty far off of the caffeine-free wagon. Again, stressful.
+
+The game itself that I set out to make was an [incremental](https://en.wikipedia.org/wiki/Incremental_game)/clicker game using [pico-8](https://www.lexaloffle.com/pico-8.php). We are all familiar with incremental games now, but only a few years ago games like [Candy Box!](https://en.wikipedia.org/wiki/Candy_Box!) set some of us loot addicts on fire but were otherwise unheard of. While they aren't really considered "games" by most, they leveraged progression systems that were being spearheaded by popular social and mobile games. Most critically, these games use the timed release of rewards against a certain amount of perceived effort to create a positive feedback loop of engagement. 
+
+While these games inspired me, I wanted to try something a bit different. Most of them depend on conveying information relatively directly. Numbers like "[cookies per second](http://orteil.dashnet.org/cookieclicker/)," "[wire per second](http://www.decisionproblem.com/paperclips/)," and how many factories you own are generally up front as a statistic. So I set out to try to create this style of game but where all but one number is displayed in some visual form. Some are still overt such as a crate representing a certain unknown number of marshmallows and which is worth $20 if you watch, but others are less so such as the speed of the loader automatons and what a speed improvement means for them.
+
+This meta goal created an interesting problem. Without the numbers to focus on, everything else needed to be both entertaining but also visually meaningful. According to feedback I managed to meet this challenge with some success. The crying robots, the news ticker across the top, the weight gain of customers, and other elements all created an environment where it was fun to watch, try to see what was changing and what your actions meant.
+
+Unfortunately, all of this richness (***cough*** complexity ***cough***) also created a problem. See, when I set out to create my game I didn't have a clear path on how to build it. These games generally depend on a tapered rollout of gameplay elements, with phases gated on time, player triggers, resource triggers, and sometimes just RNJ prayers. Only having an inkling of what this really implied for the implementation, I started building my game around a primitive manual trigger system and hand coding each individual element in a system easily controlled by such a basic scheme. 
+
+The result? A game with a number of totally unique game objects but no game object concept, just a system of uber controllers and their draw calls. Smattered amidst this are magic numbers for the triggers, duplicated logic segments, and generally a complete mishmash of "engine," gameplay, input, and system management code. This was all exacerbated by my determination to do all of it "the pico-8 way" and not use an external editor which made mid-session refactoring extremely tedious as pico-8's code editor is put down by all but maybe [ed](https://en.wikipedia.org/wiki/Ed_(text_editor)). 
+
+While I'm happy with how the game turned out for the jam (it's fun and short), I'm less pleased with what I shipped in general. I'm setting out to release a V2 of the game with audio, overhauled progression, and a slightly longer story that may *gasp* take a day or two to beat if you want to leave it running in traditional incremental game fashion. I plan on documenting this process and the horrors that I committed across those first three days so check back for progress on my quest to right my wrongs.
+
+If you'd like to try out the game in the meantime (and who wouldn't, its GOTY material) you can find it here: [Happy Happy Marshmallow Factory](http://loren.io/assets/ld/marshmallow.html)
