@@ -1,15 +1,15 @@
 ---
 layout: post
-title: The Worst Code I've Ever Written aka Happy Happy Marshmallow Factory
+title: Lets fix my LD40 project! Part 1
 categories: writing
-excerpt: Lets fix my worst code! Part 1
+excerpt: Decent game and awful implementation: the introduction
 ---
 
 [Ludum Dare 40](https://ldjam.com/) was, as is normal, stressful. While I was trying to finish in 48 hours to qualify for the [compo](https://ldjam.com/events/ludum-dare/rules), the scope of my project and the amount of testing and polishing required was at odds with the goal. My final build was uploaded a nice 20 minutes prior to the close of the jam and in the preceding (almost) 72 hours, I believe I worked about 45-50 of them. During this time, I revisited the story progression three times, published 63 builds, collected bugs and feedback from 10 different testers, and fell pretty far off of the caffeine-free wagon. Again, stressful.
 
 The game itself that I set out to make was an [incremental](https://en.wikipedia.org/wiki/Incremental_game)/clicker game using [pico-8](https://www.lexaloffle.com/pico-8.php). We are all familiar with incremental games now, but only a few years ago games like [Candy Box!](https://en.wikipedia.org/wiki/Candy_Box!) set some of us loot addicts on fire but were otherwise unheard of. While they aren't really considered "games" by most, they leveraged progression systems that were being spearheaded by popular social and mobile games. Most critically, these games use the timed release of rewards against a certain amount of perceived effort to create a positive feedback loop of engagement. 
 
-While these games inspired me, I wanted to try something a bit different. Most of them depend on conveying information relatively directly. Numbers like "[cookies per second](http://orteil.dashnet.org/cookieclicker/)," "[wire per second](http://www.decisionproblem.com/paperclips/)," and how many factories you own are generally up front as a statistic. So I set out to try to create this style of game but where all but one number is displayed in some visual form. Some are still overt such as a crate representing a certain unknown number of marshmallows and which is worth $20 if you watch, but others are less so such as the speed of the loader automatons and what a speed improvement means for them.
+While these games inspired me, I wanted to try something a bit different. Most of them depend on conveying information relatively directly. Numbers like "[cookies per second](http://orteil.dashnet.org/cookieclicker/)," "[wire per second](http://www.decisionproblem.com/paperclips/)," and how many factories you own are generally up front as a statistic. So I set out to try to create this style of game but where all but one number is displayed in a more abstract visual form. Some are still overt such as a crate representing a certain unknown number of marshmallows and which is worth $20 if you watch, but others are less so such as the speed of the loader automatons and what a speed improvement means for them.
 
 This meta goal created an interesting problem. Without the numbers to focus on, everything else needed to be both entertaining but also visually meaningful. According to feedback I managed to meet this challenge with some success. The crying robots, the news ticker across the top, the weight gain of customers, and other elements all created an environment where it was fun to watch, try to see what was changing and what your actions meant.
 
