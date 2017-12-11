@@ -3,23 +3,31 @@ version 14
 __lua__
 -- happy happy marshmallow factory
 
+-- global state
+g={
+	build=64,
+	debug=false,
+
+	-- time
+	t=0,
+	t2=0,
+	t3=0,
+	t4=0,
+	t5=0,
+	t6=0,
+	t8=0,
+
+	-- app state
+	state=nil,
+}
+
 function _init()
-	build=63
-	
-	debug=false
-	t=0
-	state=0
-	
-	--topbox
-	tip=""
-	tipx=0
-	news=""
-	
+	g.state = menu
+
 	--map
-	mlayer=0
 	e_sugar=false
 	e_bone=false
-	
+
 	--gameplay
 	p_u=false
 	p_d=false
@@ -37,17 +45,16 @@ function _init()
 	heating=0
 	mallow=0
 	e_comp=false
- e_customers=false
- newsmsg=""
- e_leftroom=false
- e_rightroom=false
- cost=1
- oven_output=1
- robot_spd=0.02
- e_snow=false
- e_chemist=false
- e_convert=false
-	
+	e_customers=false
+	e_leftroom=false
+	e_rightroom=false
+	cost=1
+	oven_output=1
+	robot_spd=0.02
+	e_snow=false
+	e_chemist=false
+	e_convert=false
+
 	--chef
 	cx=124
 	cy=60
@@ -55,127 +62,129 @@ function _init()
 	cr=false
 	has_sugar=false
 	has_bone=false
-	
+
 	-- !!!debug tool!!!
-	--skip_to(3,180,40)
-	--skip_to(4,6000,300)
+	--skip_to(3,180,140)
+	--skip_to(4,6000,200)
 	-- !!!debug tool!!!
 end
 
 function _update()
-	t+=1
-	if state==0 then
-		updatemenu()
-	elseif state==1 then
-		updategame()
-	else
-		updateclose()
-	end
+	g.t+=1
+	g.t2=flr(g.t/2)
+	g.t3=flr(g.t/3)
+	g.t4=flr(g.t/4)
+	g.t5=flr(g.t/5)
+	g.t6=flr(g.t/6)
+	g.t8=flr(g.t/8)
 
+	g.state.update()
+
+	--todo: update to use the new keyboard system
 	--if btnp(4,1) then
-	--	debug=not debug
+	-- debug=not debug
 	--end
 end
 
 function _draw()
-	if state==0 then
-		drawmenu()
-	elseif state==1 then
-		drawgame()
-	else
-		drawclose()
+	g.state.draw()
+
+	if g.debug and g.state.debug_draw != nil then
+		g.state.debug_draw()
 	end
 	
-	if debug then
-		rectfill(0,128-13,127,127,8)
-		line(0,128-14,127,128-14,5)
-		print("p:"..phase.." s:"..state.." m:"..mallow.." c:"..#customers,1,128-6,2)
-		print("$:"..money.." tb:"..t_bone.." ts:"..t_sugar.." i:"..iron.." delta:"..cdelta,1,128-12,2)
-	end
-	
+	-- todo: move into game.update
 	-- must be last thing updated
- _prevbtn=btn(5)
+	_prevbtn=btn(5)
 end
+
 -->8
---menu
+-- menu state
+menu={
+	transition=false,
+	scroll_y=0,
+	fade_step=0,
 
-__mallowy=0
-__e_intro=false
-__fadecount=0
-
-function updatemenu()
-	if btnp(5) then
-		__e_intro=true
-	end
-	
-	if __e_intro and t%1==0 then
-		__mallowy+=1
-	end
-	
-	if __mallowy==50 then
-		pal()
-		state=1
-		go_phase(0)
-	end
-end
-
-function drawmenu()
-	cls(14)
-	print("happy happy marshmallow factory", 3, 50, 10)	
+	update=function ()
+		if btnp(5) then
+			menu.transition=true
+		end
 		
-	map(16,0,0,85+__mallowy,16,16)
+		if menu.transition then
+			menu.scroll_y+=1
+		end
+		
+		if menu.scroll_y==50 then
+			g.state=game
+			go_phase(0)
+			-- todo: this reset shouldn't need to be here...
+			pal()
+		end
+	end, -- update()
 
-	if not __e_intro then
-		print("press 'x' to start", 30, 56, 15)
-		print("b"..build,1,128-6,15)
-	else
-		__fadecount+=1
-		if __fadecount<20 then
-		elseif __fadecount<30 then
- 		pal(1,0,1)
- 		pal(2,0,1)
- 		pal(4,0,1)
- 		pal(5,0,1)
- 		
- 		pal(3,5,1)
- 		pal(6,5,1)
- 		pal(8,5,1)
- 		pal(9,5,1)
- 		pal(13,5,1)
- 		
- 		pal(7,6,1)
- 		pal(10,6,1)
- 		pal(11,6,1)
- 		pal(12,6,1)
- 		pal(14,6,1)
- 		pal(15,6,1)
- 	elseif __fadecount<40 then
- 	 pal(1,0,1)
- 		pal(2,0,1)
- 		pal(4,0,1)
- 		pal(5,0,1)
- 		
- 		pal(3,0,1)
- 		pal(6,0,1)
- 		pal(8,0,1)
- 		pal(9,0,1)
- 		pal(13,0,1)
- 		
- 		pal(7,5,1)
- 		pal(10,5,1)
- 		pal(11,5,1)
- 		pal(12,5,1)
- 		pal(14,5,1)
- 		pal(15,5,1)
- 	elseif __fadecount<50 then
- 	 cls()
- 	end
- end
-end
+	draw=function()
+		cls(14)
+		print("happy happy marshmallow factory", 3, 50, 10) 
+			
+		map(16,0,0,85+menu.scroll_y,16,16)
+
+		if not menu.transition then
+			print("press 'x' to start", 30, 56, 15)
+			print("b"..g.build,1,122,15)
+		else
+			menu.fade_step+=1
+			-- todo: move this to not use the screen based system and setup a fade helper
+			if menu.fade_step<20 then
+			elseif menu.fade_step<30 then
+				pal(1,0,1)
+				pal(2,0,1)
+				pal(4,0,1)
+				pal(5,0,1)
+				
+				pal(3,5,1)
+				pal(6,5,1)
+				pal(8,5,1)
+				pal(9,5,1)
+				pal(13,5,1)
+				
+				pal(7,6,1)
+				pal(10,6,1)
+				pal(11,6,1)
+				pal(12,6,1)
+				pal(14,6,1)
+				pal(15,6,1)
+			elseif menu.fade_step<40 then
+				pal(1,0,1)
+				pal(2,0,1)
+				pal(4,0,1)
+				pal(5,0,1)
+				
+				pal(3,0,1)
+				pal(6,0,1)
+				pal(8,0,1)
+				pal(9,0,1)
+				pal(13,0,1)
+				
+				pal(7,5,1)
+				pal(10,5,1)
+				pal(11,5,1)
+				pal(12,5,1)
+				pal(14,5,1)
+				pal(15,5,1)
+			elseif menu.fade_step<50 then
+				cls()
+			end
+		end
+	end, -- draw()
+
+	debug_draw=nil
+}
+
 -->8
--- game
+-- game state
 
 -- constants
+-- todo: put these with their respective items
 sugar_box={86,32,98,48}
 bone_box={158,32,170,48}
 table_box={112,46,144,64}
@@ -185,546 +194,685 @@ iron_max=20
 iron_colors={1,5,6,6,7}
 comp_box={74,42,85,54}
 
+game={
+	-- news ticker
+	news="",
+
+	-- tutorial
+	tip="",
+	tipx=0,
+
+	-- map
+	mlayer=0,
+
+	update = function ()
+		if e_usecomp then
+			update_upgrades()
+		else
+			move_chef()
+		end
+		
+		-- pickups
+		if not has_sugar and not has_bone then
+			if e_sugar and click() and chef_in(sugar_box) then
+				has_sugar=true
+			elseif e_bone and click() and chef_in(bone_box) then
+				has_bone=true
+			end
+		end
+
+		-- dropoffs
+		if has_sugar and chef_in(table_box) then
+			has_sugar=false
+			add_sugar(20)
+		end
+		if has_bone and chef_in(table_box) then
+			has_bone=false
+			add_bone(20)
+		end
+		
+		-- boiling
+		if boiling>0 then
+			boiling-=1
+			if g.t%5==0 then
+				t_bone=max(t_bone-1,0)
+				t_sugar=max(t_sugar-1,0)
+				iron+=1
+			end
+			if iron==iron_max or t_bone==0 or t_sugar==0 then
+				boiling=0
+			end
+		end
+		if click() and can_boil() then
+			boil()
+		end
+		
+		-- baking
+		if heating>0 then
+			heating-=1
+			if g.t%5==0 then
+				iron=max(iron-1,0)
+				mallow+=oven_output
+			end
+			if iron==0 then
+				heating=0
+			end
+		end
+		if click() and can_bake() then
+			bake()
+		end
+		
+		update_robots()
+		
+		if click() and can_comp() and phase>10 then
+			e_usecomp=true
+		end
+		
+		if e_customers then
+			update_customers()
+		end
+
+		-- phase shifts
+		if phase==0 then
+			if p_u and p_d and p_r and p_l then
+				go_phase(1)
+			end
+		elseif phase==1 then
+			if has_sugar then
+				go_phase(2)
+			end
+		elseif phase==2 then
+			if t_sugar>0 then
+				go_phase(3)
+			end
+		elseif phase==3 then
+			if has_bone then
+				go_phase(4)
+			end
+		elseif phase==4 then
+			if t_bone>0 then
+				go_phase(5)
+			end
+		elseif phase==5 then
+			if iron==iron_max then
+				go_phase(6)
+			end
+		elseif phase==6 then
+			if mallow==20 then
+				go_phase(7)
+			end
+		elseif phase==7 then
+			if click() and chef_in(comp_box) then
+				go_phase(8)
+			end
+		elseif phase==8 then
+			if mallow==0 then
+				go_phase(9)
+			end
+		elseif phase==9 then
+			if mallow>0 then
+				go_phase(10)
+			end
+		elseif phase==10 then
+			if money>=50 then
+				go_phase(11)
+			end
+		elseif phase==11 then
+			if e_usecomp then
+				go_phase(12)
+			end
+		elseif phase==12 then
+			if robots[1].e==true or robots[2].e==true then
+				go_phase(13)
+			end
+		elseif phase==13 then
+			if robots[1].e==true and robots[2].e==true then
+				go_phase(14)
+			end
+		elseif phase==14 then
+			if money>=80 then
+				go_phase(15)
+			end
+		elseif phase==16 then
+			if money>=75 then
+				go_phase(17)
+			end
+		elseif phase==18 then
+			if money>=100 then
+				go_phase(19)
+			end
+		elseif phase==19 then
+			if robots[3].e and robots[4].e then
+				go_phase(20)
+			end
+		elseif phase==20 then
+			if money>=100 then
+				go_phase(21)
+			end
+		elseif phase==22 then
+			if money>=150 then
+				go_phase(23)
+			end
+		elseif phase==24 then
+			if money>=250 then
+				go_phase(25)
+			end
+		elseif phase==26 then
+			if money>500 then
+				go_phase(27)
+			end
+		elseif phase==28 then
+			if money>=40 then
+				go_phase(29)
+			end
+		elseif phase==30 then
+			if money>=500 then
+				go_phase(31)
+			end
+		elseif phase==32 then
+			if money>=400 then
+				go_phase(33)
+			end
+		elseif phase==34 then
+			if cdelta>80 then
+				go_phase(35)
+			end
+		elseif phase==35 then
+			if cdelta>170 then
+				go_phase(36)
+			end
+		end
+		
+		if money<0 then
+			money=0
+		end
+	end, -- update()
+	
+	draw = function ()
+		cls()
+		camera(64,0)
+		
+		map(8,16,0,0,32,16,game.mlayer)
+		
+		-- pickups
+		if e_sugar then
+		draw_sugar(sugar_box[1]+2,sugar_box[2],4)
+		end
+		if e_bone then
+		draw_bone(bone_box[1]+2,bone_box[2],4)
+		end
+		
+		-- drop offs {112,46,144,56}
+		if e_table then
+		rectfill(112,46,143,55,9)
+		line(116,56,116,60,5)
+		line(139,56,139,60,5)
+		end
+		if t_sugar>0 then
+			draw_sugar(117,47,flr(t_sugar/5))
+		end
+		if t_bone>0 then
+			draw_bone(131,47,flr(t_bone/5))
+		end
+		
+		-- production
+		if e_cauldron then
+			local s = boiling>0 and 46 or 14
+			spr(s,120,56,2,2,g.t6%2==0)
+			
+			pal(1,iron_colors[flr(iron/5)+1])
+			if heating>0 then
+				pal(13,g.t6%2==0 and 10 or 9)
+			end
+			spr(44,120,71,2,2)
+			if e_oven1 then
+				spr(111,133,71)
+				spr(127,133,79)
+				spr(110,115,71)
+				spr(126,115,79)
+				if e_oven2 then
+					spr(111,135,71)
+					spr(127,135,79)
+					spr(110,113,71)
+					spr(126,113,79)
+				end
+			end
+			pal()
+		end
+		
+		draw_mallows()
+		
+		if e_comp then
+			if e_upgrades and (#upgrades>0 or phase==7) then
+				spr(9+flr(g.t/5)%2,76,44)
+			else
+				spr(11,76,44)
+			end
+		end
+		
+		if phase>=8 then
+			if not e_leftroom then
+				spr(48,64,48)
+				spr(48,64,56)
+			end
+			if not e_rightroom then
+				spr(48,184,48)
+				spr(48,184,56)
+			end
+		end
+		draw_robots()
+	
+		if e_chemist then
+			draw_chemist(164,70,true,true)
+		end
+		
+		draw_chef(false,false)
+		
+		if game.mlayer>3 then
+			rectfill(114,102,140,110,0)
+			rect(114,102,140,110,13)
+		end
+		if money>0 then
+			print("$"..money,116,104,3)
+		end
+		
+		if e_customers then
+			draw_customers()
+		end
+		
+		if debug then
+			fillp(0b0011001111001100.1)
+			draw_box(table_box,8)
+			draw_box(sugar_box,8)
+			draw_box(bone_box,8)
+			draw_box(cauldron_box,9)
+			draw_box(iron_box,8)
+			draw_box(comp_box,8)
+			fillp(0)
+		end
+		
+		-- top display
+		camera(0,0)
+		-- news box
+		if phase>7 then
+			rectfill(0,0,127,7,8)
+			line(0,7,127,7,2)
+			print(game.news,128-g.t%256,1,14)
+		end
+		
+		-- tip
+		print(game.tip,game.tipx,9,14)
+		
+		-- special tutorial overlay
+		if phase==0 then
+			if p_u then
+				print("”",68,9,10)
+			end
+			if p_d then
+				print("ƒ",76,9,10)
+			end
+			if p_l then
+				print("‹",84,9,10)
+			end
+			if p_r then
+				print("‘",92,9,10)
+			end
+		elseif phase==5 then
+			print("—",106,9,flr((g.t/4)/2)%2==0 and 10 or 14)
+		elseif phase==6 then
+			print("—",96,9,flr((g.t/4)/2)%2==0 and 10 or 14)
+		elseif phase==7 then
+			print("buy factory at computer —",12,16,15)
+		end
+		
+		draw_upgrades()
+		
+		if e_fadeout then
+			fadecount+=1
+			if fadecount<30 then
+			elseif fadecount<75 then
+			pal(1,0,1)
+			pal(2,0,1)
+			pal(4,0,1)
+			pal(5,0,1)
+			
+			pal(3,5,1)
+			pal(6,5,1)
+			pal(8,5,1)
+			pal(9,5,1)
+			pal(13,5,1)
+			
+			pal(7,6,1)
+			pal(10,6,1)
+			pal(11,6,1)
+			pal(12,6,1)
+			pal(14,6,1)
+			pal(15,6,1)
+		elseif fadecount<110 then
+			pal(1,0,1)
+			pal(2,0,1)
+			pal(4,0,1)
+			pal(5,0,1)
+			
+			pal(3,0,1)
+			pal(6,0,1)
+			pal(8,0,1)
+			pal(9,0,1)
+			pal(13,0,1)
+			
+			pal(7,5,1)
+			pal(10,5,1)
+			pal(11,5,1)
+			pal(12,5,1)
+			pal(14,5,1)
+			pal(15,5,1)
+		elseif fadecount<140 then
+			cls()
+		else
+			cls()
+			state=2
+		end
+		end
+	end, -- draw()
+
+	debug_draw = function ()
+		rectfill(0,128-13,127,127,8)
+		line(0,128-14,127,128-14,5)
+		print("p:"..phase.." m:"..mallow.." c:"..#customers,1,128-6,2)
+		print("$:"..money.." tb:"..t_bone.." ts:"..t_sugar.." i:"..iron.." delta:"..cdelta,1,128-12,2)
+	end, -- debug_draw()
+
+	set_tip=function(msg,n_special)
+		game.tip=msg
+		game.tipx=64-#msg*2
+		if n_special!=nil then
+			game.tipx-=n_special*2
+		end
+	end -- set_tip()
+}
+
 function go_phase(p)
 	if p<=phase then return end
 	
 	phase=p
 	if p==0 then
-		mlayer=1
-		tip="move with ”ƒ‹‘"
-		tipx=28
+		game.mlayer=1
+		game.set_tip("move with ”ƒ‹‘",4)
 	elseif p==1 then
 		e_sugar=true
-		tip="pick up sugar with —"
-		tipx=22
+		game.set_tip("pick up sugar with —",1)
 	elseif p==2 then
 		e_sugar=false
-		tip="place sugar on table"
-		tipx=24
+		game.set_tip("place sugar on table")
 		e_table=true
 	elseif p==3 then
 		e_bone=true
-		tip="now get the bone! —"
-		tipx=26
+		game.set_tip("now get the bone! —",1)
 	elseif p==4 then
 		e_bone=false
-		tip="and deliver it"
-		tipx=36
+		game.set_tip("and deliver it")
 	elseif p==5 then
-		tip="now boil them together —"
-		tipx=14
+		game.set_tip("now boil them together —",1)
 		e_cauldron=true
 	elseif p==6 then
-		tip="finally bake them —"
-		tipx=24
+		game.set_tip("finally bake them —",1)
 		e_iron=true
 	elseif p==7 then
-		tip="you've perfected mallows!"
-		tipx=14
+		game.set_tip("you've perfected mallows!")
 		e_comp=true
 		e_upgrades=true
 	elseif p==8 then
 		-- make sure state is correct
-		mlayer=6
+		game.mlayer=6
 		money=0
 		mallow=20
 		e_upgrades=false
 		e_customers=true
-		newsmsg="mews: mallow factory opens!"
-		tip="first customers incoming"
-		tipx=16
+		game.news="mews: mallow factory opens!"
+		game.set_tip("first customers incoming")
 	elseif p==9 then
-		tip="oh no! make more mallows"
-		tipx=16
-		newsmsg="news: mallow shortage hits"
+		game.set_tip("oh no! make more mallows")
+		game.news="news: mallow shortage hits"
 		e_sugar=true
 		e_bone=true
 	elseif p==10 then
-		tip=""
-		newsmsg="news: phew, mallows back"
- elseif p==11 then
- 	newsmsg="news: who let the dogs out?"
- 	tip="upgrade available at computer"
- 	tipx=6
- 	e_upgrades=true
- 	add_upgrade("sugar bot 1.0",50,0)
- 	add_upgrade("bone bot 1.0",50,1)
- elseif p==12 then
- 	tip="buy with —"
- 	tipx=44
- elseif p==13 then
- 	newsmsg="news: mechanical keyboards rule"
- 	tip=""
- elseif p==14 then
- 	newsmsg="news: craft mallow fad grows"
- 	cdelta=75
- elseif p==15 then
- 	add_upgrade("national ads",80,2)
- 	tip="time to grow?"
- 	tipx=36
- elseif p==16 then
- 	newsmsg="news: record mallow demand"
- 	tip=""
- elseif p==17 then
- 	newsmsg="news: epic birthday eclipse"
- 	add_upgrade("expand oven",150,3)
- elseif p==18 then
- 	newsmsg="news: mmm mallows"
- 	arate=10
- elseif p==19 then
- 	newsmsg="news: fad: mallows and chill"
- 	add_upgrade("stir bot 1.0",150,4)
- 	add_upgrade("bake bot 1.0",150,5)
- elseif p==20 then
- 	arate=9
- 	newsmsg="news: mallows for breakfast?"
- elseif p==21 then
- 	arate=8
- 	add_upgrade("global ads",200,6)
- elseif p==22 then
- 	arate=7
- 	newsmsg="news: mallow-mania hits high"
- elseif p==23 then
- 	add_upgrade("add dopamine",500,7)
- 	arate=6
- elseif p==24 then
- 	newsmsg="news: mallows addictive?"
- 	arate=4
- elseif p==25 then
- 	add_upgrade("faster robots",500,8)
- 	add_upgrade("embiggen oven",800,9)
- 	arate=3
- elseif p==26 then
- 	newsmsg="news: mallows un-healthy?"
- 	arate=2
- elseif p==27 then
- 	newsmsg="news: mallows make you fat :("
- 	tip="oh no! they caught on!"
- 	tipx=20
- 	e_adults=false
- 	cdelta=75
- 	add_upgrade("hire the chemist",600,10)
- elseif p==28 then
+		game.set_tip("")
+		game.news="news: phew, mallows back"
+	elseif p==11 then
+		game.news="news: who let the dogs out?"
+		game.set_tip("upgrade available at computer")
+		e_upgrades=true
+		add_upgrade("sugar bot 1.0",50,0)
+		add_upgrade("bone bot 1.0",50,1)
+	elseif p==12 then
+		game.set_tip("buy with —")
+	elseif p==13 then
+		game.news="news: mechanical keyboards rule"
+		game.set_tip("")
+	elseif p==14 then
+		game.news="news: craft mallow fad grows"
+		cdelta=75
+	elseif p==15 then
+		add_upgrade("national ads",80,2)
+		game.set_tip("time to grow?")
+	elseif p==16 then
+		game.news="news: record mallow demand"
+		game.set_tip("")
+	elseif p==17 then
+		game.news="news: epic birthday eclipse"
+		add_upgrade("expand oven",150,3)
+	elseif p==18 then
+		game.news="news: mmm mallows"
+		arate=10
+	elseif p==19 then
+		game.news="news: fad: mallows and chill"
+		add_upgrade("stir bot 1.0",150,4)
+		add_upgrade("bake bot 1.0",150,5)
+	elseif p==20 then
+		arate=9
+		game.news="news: mallows for breakfast?"
+	elseif p==21 then
+		arate=8
+		add_upgrade("global ads",200,6)
+	elseif p==22 then
+		arate=7
+		game.news="news: mallow-mania hits high"
+	elseif p==23 then
+		add_upgrade("add dopamine",500,7)
+		arate=6
+	elseif p==24 then
+		game.news="news: mallows addictive?"
+		arate=4
+	elseif p==25 then
+		add_upgrade("faster robots",500,8)
+		add_upgrade("embiggen oven",800,9)
+		arate=3
+	elseif p==26 then
+		game.news="news: mallows un-healthy?"
+		arate=2
+	elseif p==27 then
+		game.news="news: mallows make you fat :("
+		game.set_tip("oh no! they caught on!")
+		e_adults=false
+		cdelta=75
+		add_upgrade("hire the chemist",600,10)
+	elseif p==28 then
 		e_chemist=true
- 	tip="...researching..."
- 	tipx=30
- elseif p==29 then
-  tip="..."
- 	tipx=58
- 	add_upgrade("add cocaine",40,11)
- elseif p==30 then
- 	tip="dope. let them eat coke."
- 	tipx=16
- 	e_adults=true
+		game.set_tip("...researching...")
+	elseif p==29 then
+		game.set_tip("...")
+		add_upgrade("add cocaine",40,11)
+	elseif p==30 then
+		game.set_tip("dope. let them eat coke.")
+		e_adults=true
 		cdelta=20
 		adelta=25
- 	e_snow=true
- 	cost=2
- 	newsmsg="news: mallows back on the table"
- elseif p==31 then
- 	tip="hehe"
- 	tipx=56
- 	newsmsg="news: wait! mallows are drugs!"
- 	add_upgrade("buyout media",1000,12)
- elseif p==32 then
- 	newsmsg="mallow news network buys media"
- 	tip="be more evil. why not."
- 	tipx=20
- elseif p==33 then
- 	newsmsg="mnn: mallows are life"
- 	tip=""
- 	tipx=30
- 	add_upgrade("magic mallows",1000,13)
- elseif p==34 then
- 	newsmsg="mnn: you are what you eat"
- 	tip="the other other white meat"
- 	tipx=12
- 	e_convert=true
- elseif p==35 then
- 	newsmsg="mnn: mallowcaust unstoppable"
- 	tip=""
- elseif p==36 then
- 	newsmsg="mnn: mallow mallow mallow mallow"
- 	add_upgrade("convert earth",0,14)
- elseif p==37 then
- 	e_usecomp=false
- 	e_fadeout=true
- 	fadecount=0
- end
-end
-
-function updategame()
-	if e_usecomp then
-		update_upgrades()
-	else
- 	move_chef()
- end
- 
-	-- pickups
-	if not has_sugar and not has_bone then
- 	if e_sugar and click() and chef_in(sugar_box) then
- 		has_sugar=true
- 	elseif e_bone and click() and chef_in(bone_box) then
- 	 has_bone=true
- 	end
-	end
-
-	-- dropoffs
-	if has_sugar and chef_in(table_box) then
-		has_sugar=false
-	 add_sugar(20)
-	end
-	if has_bone and chef_in(table_box) then
-		has_bone=false
-		add_bone(20)
-	end
-	
-	-- boiling
-	if boiling>0 then
-		boiling-=1
-		if t%5==0 then
-			t_bone=max(t_bone-1,0)
-			t_sugar=max(t_sugar-1,0)
-			iron+=1
-		end
-		if iron==iron_max or t_bone==0 or t_sugar==0 then
-			boiling=0
-		end
-	end
-	if click() and can_boil() then
-		boil()
-	end
-	
-	-- baking
-	if heating>0 then
-		heating-=1
-		if t%5==0 then
-			iron=max(iron-1,0)
-			mallow+=oven_output
-		end
-		if iron==0 then
-			heating=0
-		end
-	end
-	if click() and can_bake() then
-		bake()
-	end
-	
-	update_robots()
-	
-	if click() and can_comp() and phase>10 then
-		e_usecomp=true
-	end
-	
-	if e_customers then
-		update_customers()
-	end
-
-	-- phase shifts
-	if phase==0 then
-		if p_u and p_d and p_r and p_l then
-			go_phase(1)
-		end
-	elseif phase==1 then
-		if has_sugar then
-			go_phase(2)
-		end
-	elseif phase==2 then
-		if t_sugar>0 then
-			go_phase(3)
-		end
-	elseif phase==3 then
-		if has_bone then
-			go_phase(4)
-		end
-	elseif phase==4 then
-		if t_bone>0 then
-			go_phase(5)
-		end
-	elseif phase==5 then
-		if iron==iron_max then
-			go_phase(6)
-		end
-	elseif phase==6 then
-		if mallow==20 then
-			go_phase(7)
-		end
-	elseif phase==7 then
-		if click() and chef_in(comp_box) then
-			go_phase(8)
-		end
-	elseif phase==8 then
-		if mallow==0 then
-			go_phase(9)
-		end
-	elseif phase==9 then
-		if mallow>0 then
-			go_phase(10)
-		end
-	elseif phase==10 then
-		if money>=50 then
-			go_phase(11)
-		end
-	elseif phase==11 then
-		if e_usecomp then
-			go_phase(12)
-		end
-	elseif phase==12 then
-		if robots[1].e==true or robots[2].e==true then
-			go_phase(13)
-		end
-	elseif phase==13 then
-		if robots[1].e==true and robots[2].e==true then
-			go_phase(14)
-		end
-	elseif phase==14 then
-		if money>=80 then
-			go_phase(15)
-		end
-	elseif phase==16 then
-		if money>=75 then
-			go_phase(17)
-		end
-	elseif phase==18 then
-		if money>=100 then
-			go_phase(19)
-		end
-	elseif phase==19 then
-		if robots[3].e and robots[4].e then
-			go_phase(20)
-		end
-	elseif phase==20 then
-		if money>=100 then
-			go_phase(21)
-		end
- elseif phase==22 then
- 	if money>=150 then
- 		go_phase(23)
- 	end
- elseif phase==24 then
- 	if money>=250 then
- 		go_phase(25)
- 	end
- elseif phase==26 then
- 	if money>500 then
- 		go_phase(27)
- 	end
- elseif phase==28 then
- 	if money>=40 then
- 		go_phase(29)
- 	end
- elseif phase==30 then
- 	if money>=500 then
- 		go_phase(31)
- 	end
- elseif phase==32 then
- 	if money>=400 then
- 		go_phase(33)
- 	end
- elseif phase==34 then
- 	if cdelta>80 then
- 		go_phase(35)
- 	end
- elseif phase==35 then
- 	if cdelta>170 then
- 		go_phase(36)
- 	end
-	end
-	
-	if money<0 then
-		money=0
+		e_snow=true
+		cost=2
+		game.news="news: mallows back on the table"
+	elseif p==31 then
+		game.set_tip("hehe")
+		game.news="news: wait! mallows are drugs!"
+		add_upgrade("buyout media",1000,12)
+	elseif p==32 then
+		game.news="mallow news network buys media"
+		game.set_tip("be more evil. why not.")
+	elseif p==33 then
+		game.news="mnn: mallows are life"
+		game.set_tip("")
+		add_upgrade("magic mallows",1000,13)
+	elseif p==34 then
+		game.news="mnn: you are what you eat"
+		game.set_tip("the other other white meat")
+		e_convert=true
+	elseif p==35 then
+		game.news="mnn: mallowcaust unstoppable"
+		game.set_tip("")
+	elseif p==36 then
+		game.news="mnn: mallow mallow mallow mallow"
+		add_upgrade("convert earth",0,14)
+	elseif p==37 then
+		e_usecomp=false
+		e_fadeout=true
+		fadecount=0
 	end
 end
 
-function drawgame()
- cls()
- camera(64,0)
- 
- map(8,16,0,0,32,16,mlayer)
- 
- -- pickups
- if e_sugar then
- 	draw_sugar(sugar_box[1]+2,sugar_box[2],4)
- end
- if e_bone then
- 	draw_bone(bone_box[1]+2,bone_box[2],4)
- end
- 
- -- drop offs {112,46,144,56}
- if e_table then
- 	rectfill(112,46,143,55,9)
- 	line(116,56,116,60,5)
- 	line(139,56,139,60,5)
- end
- if t_sugar>0 then
-		draw_sugar(117,47,flr(t_sugar/5))
-	end
-	if t_bone>0 then
-		draw_bone(131,47,flr(t_bone/5))
-	end
-	
-	-- production
-	if e_cauldron then
-		local s = boiling>0 and 46 or 14
-		local t0 = flr(t/6)
-		spr(s,120,56,2,2,t0%2==0)
+-->8
+-- closing state
+closing={
+	starcolor=0,
+	scroll_y=64,
+	t=0,
+	msg="",
+	msg_x=0,
+	msg_time=0,
+	msg_color=0,
+	-- todo: convert to use game objects?
+	e_pop0=false,
+	pop0x=0,
+	e_pop1=false,
+	pop1x=0,
+
+	update=function ()
+		closing.t+=1
+		local t=closing.t
+
+		if t==5 then
+			closing.starcolor=1
+		elseif t==35 then
+			closing.starcolor=5
+		elseif t==65 then
+			closing.starcolor=6
+		elseif t==90 then
+			closing.starcolor=7
+		end
 		
-		pal(1,iron_colors[flr(iron/5)+1])
-		if heating>0 then
-			pal(13,t0%2==0 and 10 or 9)
+		if t<128 then
+			if t%2==0 then
+				closing.scroll_y-=1
+			end
 		end
-		spr(44,120,71,2,2)
-		if e_oven1 then
-		 spr(111,133,71)
-		 spr(127,133,79)
-		 spr(110,115,71)
-		 spr(126,115,79)
-		 if e_oven2 then
- 		 spr(111,135,71)
- 		 spr(127,135,79)
- 		 spr(110,113,71)
- 		 spr(126,113,79)
-		 end
+		
+		-- todo: convert these to be in a list that gets auto run
+		if t==160 then
+			closing_set_text("you've done it")
+		elseif t==340 then
+			closing_set_text("but...")
+		elseif t==520 then
+			closing.e_pop0=true
+			closing_set_text("loneliness always wins")
+		elseif t==670 then
+			closing.e_pop1=true
+		elseif t==700 then
+			closing_set_text("mallow mallow mallow mallow")
+		elseif t==880 then
+			closing_set_text("a ludum dare 40 jam game")
+		elseif t==1060 then
+			closing_set_text("by loren 'thechemist' hoffman")
+		elseif t==1240 then
+			closing_set_text("thank you for playing")
+		elseif t==1420 then
+			closing_set_text("special thanks to:")
+		elseif t==1600 then
+			closing_set_text("crusher4")
+		elseif t==1780 then
+			closing_set_text("haxo leilas")
+		elseif t==1960 then
+			closing_set_text("rogar")
+		elseif t==2140 then
+			closing_set_text("ryder")
+		elseif t==2320 then
+			closing_set_text("silvr")
+		elseif t==2500 then
+			closing_set_text("pyrakra")
 		end
+		
+		if closing.msg_time>120 then
+			closing.msg_color=5
+		elseif closing.msg_time>90 then
+			closing.msg_color=6
+		elseif closing.msg_time>60 then
+			closing.msg_color=14
+		elseif closing.msg_time>30 then
+			closing.msg_color=6
+		elseif closing.msg_time>0 then
+			closing.msg_color=5
+		else
+			closing.msg_color=0
+			closing.msg=""
+		end
+		closing.msg_time=max(closing.msg_time-1,0)
+		
+		if closing.e_pop0 then
+			closing.pop0x+=1
+		end
+		
+		if closing.e_pop1 then
+			closing.pop1x+=1
+		end
+	end, -- update()
+
+	draw=function ()
+		cls()
+		camera(0,0)
+		pal(7,closing.starcolor)
+		map(0,0,0,closing.scroll_y,16,16)
+		map(0,0,0,-128+closing.scroll_y,16,16)
 		pal()
-	end
-	
-	draw_mallows()
-	
-	if e_comp then
-		if e_upgrades and (#upgrades>0 or phase==7) then
-	 	spr(9+flr(t/5)%2,76,44)
-	 else
-	 	spr(11,76,44)
-	 end
- end
- 
- if phase>=8 then
- 	if not e_leftroom then
- 		spr(48,64,48)
- 		spr(48,64,56)
- 	end
- 	if not e_rightroom then
- 		spr(48,184,48)
- 		spr(48,184,56)
- 	end
- end
- 
- draw_robots()
-	
-	if e_chemist then
-		draw_chemist(164,70,true,true)
-	end
- 
-	draw_chef(false,false)
-	
- if mlayer>3 then
- 	rectfill(114,102,140,110,0)
- 	rect(114,102,140,110,13)
- end
- if money>0 then
-	 print("$"..money,116,104,3)
-	end
-	
-	if e_customers then
-		draw_customers()
-	end
-	
-	if debug then
-		fillp(0b0011001111001100.1)
-		draw_box(table_box,8)
-		draw_box(sugar_box,8)
-		draw_box(bone_box,8)
-		draw_box(cauldron_box,9)
-		draw_box(iron_box,8)
-		draw_box(comp_box,8)
-		fillp(0)
-	end
-	
-	-- top display
-	camera(0,0)
-	-- news box
-	if phase>7 then
- 	rectfill(0,0,127,7,8)
- 	line(0,7,127,7,2)
- 	local t2=flr(t)
- 	print(newsmsg,128-t2%256,1,14)
-	end
-	
-	-- tip
-	print(tip,tipx,9,14)
-	
-	-- special tutorial overlay
-	if phase==0 then
-		if p_u then
-			print("”",68,9,10)
+		map(16,0,0,84+closing.scroll_y,16,16)
+		
+		if closing.e_pop1 and closing.e_pop0 then
+			spr(100+g.t3%5, 45,86)
+		else
+			spr(g.t6%2==0 and 6 or 13,45,85+closing.scroll_y,1,1,closing.e_pop0)
 		end
-		if p_d then
-			print("ƒ",76,9,10)
+		draw_chemist(75, 99+closing.scroll_y, not closing.e_pop0, not closing.e_pop1)
+		
+		print(closing.msg, closing.msg_x, 60, closing.msg_color)
+		
+		if closing.e_pop0 then
+			local x=75+closing.pop0x
+			local y=91+curve(closing.pop0x/24)*-25
+			spr(125,x,y)
 		end
-		if p_l then
-			print("‹",84,9,10)
+		
+		if closing.e_pop1 then
+			local x=83+closing.pop1x
+			local y=88+curve(closing.pop1x/16)*-35
+			spr(124,x,y)
 		end
-		if p_r then
-			print("‘",92,9,10)
-		end
-	elseif phase==5 then
-		print("—",106,9,flr((t/4)/2)%2==0 and 10 or 14)
-	elseif phase==6 then
-		print("—",96,9,flr((t/4)/2)%2==0 and 10 or 14)
-	elseif phase==7 then
-		print("buy factory at computer —",12,16,15)
-	end
-	
-	draw_upgrades()
-	
-	if e_fadeout then
-		fadecount+=1
-		if fadecount<30 then
-		elseif fadecount<75 then
- 		pal(1,0,1)
- 		pal(2,0,1)
- 		pal(4,0,1)
- 		pal(5,0,1)
- 		
- 		pal(3,5,1)
- 		pal(6,5,1)
- 		pal(8,5,1)
- 		pal(9,5,1)
- 		pal(13,5,1)
- 		
- 		pal(7,6,1)
- 		pal(10,6,1)
- 		pal(11,6,1)
- 		pal(12,6,1)
- 		pal(14,6,1)
- 		pal(15,6,1)
- 	elseif fadecount<110 then
- 	 pal(1,0,1)
- 		pal(2,0,1)
- 		pal(4,0,1)
- 		pal(5,0,1)
- 		
- 		pal(3,0,1)
- 		pal(6,0,1)
- 		pal(8,0,1)
- 		pal(9,0,1)
- 		pal(13,0,1)
- 		
- 		pal(7,5,1)
- 		pal(10,5,1)
- 		pal(11,5,1)
- 		pal(12,5,1)
- 		pal(14,5,1)
- 		pal(15,5,1)
- 	elseif fadecount<140 then
- 	 cls()
- 	else
- 		cls()
- 		state=2
- 	end
-	end
+	end, -- draw()
+
+	debug_draw=nil
+}
+
+function closing_set_text(msg)
+	closing.msg = msg
+	closing.msg_x = 64-(#msg*2)
+	closing.msg_time = 150
 end
+
 -->8
 -- util
 
@@ -733,9 +881,9 @@ end
 -- 2==skip first customers
 -- 3==skip to first ad
 function skip_to(p,mo,ma)
- if p==0 then return end
+	if p==0 then return end
 	
-	state=1
+	g.state=game
 	local target
 	if     p==1 then target=8
 	elseif p==2 then target=10
@@ -743,7 +891,6 @@ function skip_to(p,mo,ma)
 	elseif p==4 then target=20
 	end
 	
-	local i
 	for i=0,target do
 		go_phase(i)
 	end
@@ -753,9 +900,13 @@ function skip_to(p,mo,ma)
 end
 
 function lerp(x,y,s)
- if s>0.95 then s=1 end
- if s<0.05 then s=0 end
+	if s>0.95 then s=1 end
+	if s<0.05 then s=0 end
 	return x+(y-x)*s
+end
+
+function curve(x)
+	return -((x-1)*(x-1))+1
 end
 
 function add_sugar(amt)
@@ -775,7 +926,7 @@ function can_boil()
 end
 
 function boil()
- boiling=min(boiling+10,10)
+	boiling=min(boiling+10,10)
 end
 
 function allow_bake()
@@ -783,11 +934,11 @@ function allow_bake()
 end
 
 function can_bake()
- return e_iron and chef_in(iron_box) and allow_bake()
+	return e_iron and chef_in(iron_box) and allow_bake()
 end
 
 function bake()
- heating=min(heating+10,10)
+	heating=min(heating+10,10)
 end
 
 function can_comp()
@@ -823,7 +974,7 @@ function move_chef()
 		cx=70
 	end
 	if cx>178 then
-	 cx=178
+		cx=178
 	end
 	if cy<34 then
 		cy=34
@@ -834,10 +985,8 @@ function move_chef()
 end
 
 function draw_chef()
-	local t3=flr(t/3)
-	local t6=flr(t/6)
 	if moving then
-	 spr(7+t3%2,cx,cy,1,1,cr)
+		spr(7+g.t3%2,cx,cy,1,1,cr)
 	else
 		local sp=6
 		
@@ -846,7 +995,7 @@ function draw_chef()
 		or can_boil()
 		or can_bake() 
 		or can_comp() then
-			sp = t6%2==0 and 6 or 13
+			sp=g.t6%2==0 and 6 or 13
 		end
 		
 		spr(sp,cx,cy,1,1,cr)
@@ -878,14 +1027,12 @@ function chef_in(box)
 end
 
 function draw_chemist(x,y,eb,ec)
-	local t2=flr(t/3)
-	local t4=flr(t/4)
 	if eb then
-		spr(77+t2%2,x,y-16)
-		spr(93+t2%2,x,y-8)
+		spr(77+g.t3%2,x,y-16)
+		spr(93+g.t3%2,x,y-8)
 	end
 	if ec then
-		spr(96+t4%4,x+9,y-10,1,1,true)
+		spr(96+g.t4%4,x+9,y-10,1,1,true)
 	end
 end
 
@@ -917,43 +1064,43 @@ function draw_mallows()
 end
 
 crate_locs={
- {124,89,0},
- {73,95,0},
- {83,95,0},
- {93,95,0},
- {103,95,0},
- {113,95,0},
- {175,95,0},
- {165,95,0},
- {155,95,0},
- {145,95,0},
- {135,95,0},
- {73,85,0},
- {83,85,0},
- {93,85,0},
- {103,85,0},
- {175,85,0},
- {165,85,0},
- {155,85,0},
- {145,85,0},
- {73,75,0},
- {83,75,0},
- {93,75,0},
- {103,75,0},
- {175,75,0},
- {165,75,0},
- {155,75,0}
+	{124,89,0},
+	{73,95,0},
+	{83,95,0},
+	{93,95,0},
+	{103,95,0},
+	{113,95,0},
+	{175,95,0},
+	{165,95,0},
+	{155,95,0},
+	{145,95,0},
+	{135,95,0},
+	{73,85,0},
+	{83,85,0},
+	{93,85,0},
+	{103,85,0},
+	{175,85,0},
+	{165,85,0},
+	{155,85,0},
+	{145,85,0},
+	{73,75,0},
+	{83,75,0},
+	{93,75,0},
+	{103,75,0},
+	{175,75,0},
+	{165,75,0},
+	{155,75,0}
 }
 
 _prevbtn=nil
 function click()
 	local ret=false
- if btn(5) then
-  ret=
-  	_prevbtn==nil or 
-  	_prevbtn==false
- end
- return ret
+	if btn(5) then
+		ret=
+	_prevbtn==nil or 
+	_prevbtn==false
+	end
+	return ret
 end
 -->8
 -- customers
@@ -973,59 +1120,59 @@ arate=1000
 
 function add_customer()
 	if mallow>5 then
- 	if ctime==0 and e_children then
- 		local col=flr(rnd(2))%2==0 and 12 or 14
- 		add(customers,
- 			{
- 				x=192+flr(rnd(15)),
- 				p=40,
- 				r=false,
- 				c=col,
- 				y=flr(rnd(7)),
- 				s=26,
- 				fat=false
- 			})
- 		ctime=cdelta
- 		if atime==0 then
- 			atime+=flr(adelta/2)
- 		end
- 		
- 		if e_convert then
- 			cdelta+=flr(cdelta/10)+1
- 			if cdelta>170 then
- 				e_children=false
- 			end
- 		end
- 	end
- 	
- 	if atime==0 and e_adults then
- 		local r1=flr(rnd(2))
- 		local r2=flr(rnd(arate))
- 		local sp
- 		if r1==0 then
- 			sp=r2!=0 and 64 or 83
- 		else
- 		 sp=r2!=0 and 80 or 88
- 		end 
- 		add(customers,
- 		 {
- 		 	x=192+flr(rnd(15)),
- 		 	p=56,
- 		 	r=false,
- 		 	c=0,
- 		 	y=flr(rnd(7)),
- 		 	s=sp,
- 		 	fat=r2==0
- 		 })
- 		atime=adelta
- 		
- 		if e_convert then
- 			adelta+=flr(adelta/10)+1
- 			if adelta>170 then
- 				e_adults=false
- 			end
- 		end
- 	end
+	if ctime==0 and e_children then
+		local col=flr(rnd(2))%2==0 and 12 or 14
+		add(customers,
+			{
+				x=192+flr(rnd(15)),
+				p=40,
+				r=false,
+				c=col,
+				y=flr(rnd(7)),
+				s=26,
+				fat=false
+			})
+		ctime=cdelta
+		if atime==0 then
+			atime+=flr(adelta/2)
+		end
+		
+		if e_convert then
+			cdelta+=flr(cdelta/10)+1
+			if cdelta>170 then
+				e_children=false
+			end
+		end
+	end
+	
+	if atime==0 and e_adults then
+		local r1=flr(rnd(2))
+		local r2=flr(rnd(arate))
+		local sp
+		if r1==0 then
+			sp=r2!=0 and 64 or 83
+		else
+			sp=r2!=0 and 80 or 88
+		end 
+		add(customers,
+			{
+			x=192+flr(rnd(15)),
+			p=56,
+			r=false,
+			c=0,
+			y=flr(rnd(7)),
+			s=sp,
+			fat=r2==0
+			})
+		atime=adelta
+		
+		if e_convert then
+			adelta+=flr(adelta/10)+1
+			if adelta>170 then
+				e_adults=false
+			end
+		end
+	end
 	end
 	
 	if ctime>0 then ctime-=1 end
@@ -1040,17 +1187,17 @@ function update_customers()
 		if c.x>cstop then
 			c.x-=0.5
 		elseif c.x==cstop then
-		 if c.p>0 then
-		 	if mallow>0 then
- 		 	c.p-=1
- 		 	if c.p%8==0 then
-  		 	mallow-=1
-  		 	money+=cost
- 		 	end
-		 	end
-		 else
-		 	c.x-=1
-		 end
+			if c.p>0 then
+			if mallow>0 then
+			c.p-=1
+			if c.p%8==0 then
+			mallow-=1
+			money+=cost
+			end
+			end
+			else
+			c.x-=1
+			end
 		else
 			c.x-=1
 			if c.x<57 then
@@ -1071,9 +1218,7 @@ function update_customers()
 end
 
 function draw_customers()
- local t3=flr(t/3)
- local t6=flr(t/6)
- --todo:cry if paused
+	--todo:cry if paused
 	for i = #customers,1,-1 do
 		local c=customers[i]
 		if c.c!=0 then 
@@ -1082,27 +1227,27 @@ function draw_customers()
 			pal()
 		end
 	
-		local spd=(c.x>cstop and t6 or t3)
+		local spd=(c.x>cstop and g.t6 or g.t3)
 		if not c.fat then
- 		if e_convert and c.x<cstop then
- 			spr(123,c.x,114+c.y+sin((c.x+c.y)/20))
- 		elseif c.x!=cstop then
- 			spr(c.s+1+spd%2,c.x,114+c.y)
- 		else
- 			spr(c.s,c.x,114+c.y)
- 		end
- 	else
- 		if e_convert and c.x<cstop then
- 		 spr(125,c.x,114+c.y+sin((c.x+c.y)/20))
- 		else
-  		if c.x!=cstop then
-  		 spr(c.s+1+spd%4,c.x,114+c.y)
-  		else
-  			spr(c.s,c.x,114+c.y)
-  		end
-  		spr(c.s-16,c.x,106+c.y)
-  	end
- 	end
+		if e_convert and c.x<cstop then
+			spr(123,c.x,114+c.y+sin((c.x+c.y)/20))
+		elseif c.x!=cstop then
+			spr(c.s+1+spd%2,c.x,114+c.y)
+		else
+			spr(c.s,c.x,114+c.y)
+		end
+	else
+		if e_convert and c.x<cstop then
+			spr(125,c.x,114+c.y+sin((c.x+c.y)/20))
+		else
+		if c.x!=cstop then
+			spr(c.s+1+spd%4,c.x,114+c.y)
+		else
+			spr(c.s,c.x,114+c.y)
+		end
+		spr(c.s-16,c.x,106+c.y)
+	end
+	end
 	end
 	pal()
 end
@@ -1115,7 +1260,7 @@ e_usecomp=false
 comp_row=1
 
 function add_upgrade(name,cost,id)
- add(upgrades,{n=name,c=cost,i=id})
+	add(upgrades,{n=name,c=cost,i=id})
 end
 
 function purchase(id)
@@ -1166,44 +1311,42 @@ function purchase(id)
 end
 
 function update_upgrades()
- if not e_usecomp then return end
- 
- if btnp(4) then
- 	e_usecomp=false
- 	comp_row=1
- end
- 
- if #upgrades>0 then
- 	local u = upgrades[comp_row]
-  
-  if btnp(5) and u.c<=money then
-  	purchase(u.i)
-  	money-=u.c
-  	del(upgrades,u)
-  else
-  	if btnp(2) then
-   	comp_row-=1	
-   elseif btnp(3) then
-   	comp_row+=1
-   end
-  end
- 
-	 comp_row=min(#upgrades,max(1,comp_row))
+	if not e_usecomp then return end
+	
+	if btnp(4) then
+	e_usecomp=false
+	comp_row=1
+	end
+	
+	if #upgrades>0 then
+	local u = upgrades[comp_row]
+		
+		if btnp(5) and u.c<=money then
+	purchase(u.i)
+	money-=u.c
+	del(upgrades,u)
+		else
+	if btnp(2) then
+	comp_row-=1 
+			elseif btnp(3) then
+	comp_row+=1
+			end
+		end
+	
+		comp_row=min(#upgrades,max(1,comp_row))
 	end
 end
 
 function draw_upgrades()
- if not e_usecomp then return end
-
-	local t8=flr(t/8)
- 
- map(112,0,0,0,16,16)
- 
+	if not e_usecomp then return end
+	
+	map(112,0,0,0,16,16)
+	
 	if #upgrades>0 then
-  if t8%2==0 then
- 	 spr(36,20,22+comp_row*6)
- 	end
- end
+		if g.t8%2==0 then
+		spr(36,20,22+comp_row*6)
+	end
+	end
 	
 	local offset=0
 	for u in all(upgrades) do
@@ -1224,32 +1367,30 @@ end
 
 robot_anim={37,39,38,39}
 function draw_robot(x,y,i,item)
- local t4=flr(t/4)
- if i then
- 	spr(40+t4%4,x,y)
- else
-	 spr(robot_anim[1+t4%4],x,y)
-	 if item!=0 then
-	 	spr(item,x,y-8)
-	 end
+	if i then
+	spr(40+g.t4%4,x,y)
+	else
+		spr(robot_anim[1+g.t4%4],x,y)
+		if item!=0 then
+		spr(item,x,y-8)
+		end
 	end
 end
 
 srobot_anim={56,58,57,58}
 function draw_srobot(x,y,i)
-	local t4=flr(t/4)
 	if i then
- 	spr(40+t4%4,x+2,y)
- else
-	 spr(srobot_anim[1+t4%4],x,y)
-	end	
+	spr(40+g.t4%4,x+2,y)
+	else
+		spr(srobot_anim[1+g.t4%4],x,y)
+	end 
 end
 
 robots={
- {e=false,x=0,y=0,sx=88,sy=40,tx=117,ty=55,s=0,idle=true,item=0},
- {e=false,x=0,y=0,sx=160,sy=40,tx=131,ty=55,s=0,idle=true,item=0},
- {e=false,x=134,y=61,idle=true},
- {e=false,x=135,y=76,idle=true},
+	{e=false,x=0,y=0,sx=88,sy=40,tx=117,ty=55,s=0,idle=true,item=0},
+	{e=false,x=0,y=0,sx=160,sy=40,tx=131,ty=55,s=0,idle=true,item=0},
+	{e=false,x=134,y=61,idle=true},
+	{e=false,x=135,y=76,idle=true},
 }
 
 function enable_bot(b)
@@ -1276,7 +1417,7 @@ function exe_delivery(bot,spd,item,do_work)
 		bot.item=0
 		ret = true
 	elseif bot.item==0 and bot.s==0 then
-	 bot.idle=true
+		bot.idle=true
 	end
 	
 	return ret
@@ -1287,11 +1428,11 @@ function update_robots()
 		add_sugar(20)
 	end
 	if robots[2].e and exe_delivery(robots[2],robot_spd,5,t_bone==0) then
-	 add_bone(20)
+		add_bone(20)
 	end
 	
 	if robots[3].e then
-		robots[3].idle = not allow_boil()	
+		robots[3].idle = not allow_boil() 
 		if not robots[3].idle then
 			boil()
 		end
@@ -1317,139 +1458,7 @@ function draw_robots()
 		end
 	end
 end
--->8
--- closing
 
-_starcolor=0
-_mallowy=64
-_time=0
-_msg=""
-_msgx=0
-_msgtime=0
-_msgcolor=0
-_e_pop0=false
-_popx=0
-_e_pop1=false
-_pop1x=0
-
-function settext(msg)
-	_msg=msg
-	_msgx=64-(#msg*2)
-	_msgtime=150
-end
-
-function updateclose()
-		_time+=1
-		if _time==5 then
-			_starcolor=1
-		elseif _time==35 then
-			_starcolor=5
-		elseif _time==65 then
-			_starcolor=6
-		elseif _time==90 then
-			_starcolor=7
-		end
-		
-		if _time<128 then
-			if _time%2==0 then
-				_mallowy-=1
-			end
-		end
-		
-		if _time==160 then
-			settext("you've done it")
-		elseif _time==340 then
-			settext("but...")
-		elseif _time==520 then
-			_e_pop0=true
-			settext("loneliness always wins")
-		elseif _time==670 then
-			_e_pop1=true
-		elseif _time==700 then
-			settext("mallow mallow mallow mallow")
-		elseif _time==880 then
-			settext("a ludum dare 40 jam game")
-		elseif _time==1060 then
-			settext("by loren 'thechemist' hoffman")
-		elseif _time==1240 then
-			settext("thank you for playing")
-		elseif _time==1420 then
-			settext("special thanks to:")
-		elseif _time==1600 then
-			settext("crusher4")
-		elseif _time==1780 then
-			settext("haxo leilas")
-		elseif _time==1960 then
-			settext("rogar")
-		elseif _time==2140 then
-			settext("ryder")
-		elseif _time==2320 then
-			settext("silvr")
-		elseif _time==2500 then
-			settext("pyrakra")
-		end
-		
-		if _msgtime>120 then
-			_msgcolor=5
-		elseif _msgtime>90 then
-			_msgcolor=6
-		elseif _msgtime>60 then
-			_msgcolor=14
-		elseif _msgtime>30 then
-			_msgcolor=6
-		elseif _msgtime>0 then
-			_msgcolor=5
-		else
-			_msgcolor=0
-			_msg=""
-		end
-		_msgtime=max(_msgtime-1,0)
-		
-		if _e_pop0 then
-			_popx+=1
-		end
-		
-		if _e_pop1 then
-			_pop1x+=1
-		end
-end
-
-function drawclose()
-	cls()
-	camera(0,0)
-	pal(7,_starcolor)
-	map(0,0,0,_mallowy,16,16)
-	map(0,0,0,-128+_mallowy,16,16)
-	pal()
- map(16,0,0,84+_mallowy,16,16)
-	
-	local t3=flr(t/3)
-	local t6=flr(t/6)	
-	if _e_pop1 and _e_pop0 then
-		spr(100+t3%5, 45,86)
-	else
-		spr(t6%2==0 and 6 or 13,45,85+_mallowy,1,1,_e_pop0)
-	end
-	draw_chemist(75,99+_mallowy,not _e_pop0,not _e_pop1)
-	
-	print(_msg,_msgx,60,_msgcolor)
-	
-	if _e_pop0 then
-		local x=75+_popx
-		local y=91+curve(_popx/24)*-25
-		spr(125,x,y)
-	end
-	
-	if _e_pop1 then
-		local x=83+_pop1x
-		local y=88+curve(_pop1x/16)*-35
-		spr(124,x,y)
-	end
-end
-
-function curve(x)
-	return -((x-1)*(x-1))+1
-end
 __gfx__
 00000000000000000000000000000000000000000000076000777700007777000077770009999900099999000999990044444444007777000000000000000000
 000000000000000000000000000000000000000000000776004667700046677000466770933333909b3333909111119045555554004667700000088888800000
