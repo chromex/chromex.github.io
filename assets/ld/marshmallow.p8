@@ -5,7 +5,7 @@ __lua__
 
 -- global state
 g={
-	build=65,
+	build=66,
 	debug=false,
 	t=0
 
@@ -59,7 +59,7 @@ function _init()
 
 	-- !!!debug tool!!!
 	--skip_to(3,180,140)
-	--skip_to(4,6000,200)
+	skip_to(4,6000,200)
 	-- !!!debug tool!!!
 end
 
@@ -918,12 +918,14 @@ function create_sprite(x,y,anims,update)
 		x=x,
 		y=y,
 		update=update,
-		draw=function (self)
-			local a=self.anims[self.anim]
-			local t=flr(g.t/a[1])
-			spr(a[2+t%a[1]],self.x,self.y)
-		end
+		draw=sprite_draw
 	}
+end
+
+function sprite_draw(self)
+	local a=self.anims[self.anim]
+	local t=flr(g.t/a[1])
+	spr(a[2+t%a[1]],self.x,self.y)
 end
 
 function add_sugar(amt)
@@ -1382,8 +1384,6 @@ end
 -->8
 -- automatons
 
--- todo: missing carry item
-
 function create_mover(sx,sy,tx,ty,item,can_work,comp_work)
 	local r=create_sprite(sx,sy,{{4,40,41,42,43},{4,37,39,38,39}},bot_carry_update)
 	r.sx=sx
@@ -1395,6 +1395,12 @@ function create_mover(sx,sy,tx,ty,item,can_work,comp_work)
 	r.item=item
 	r.can_work=can_work
 	r.comp_work=comp_work
+	r.draw=function(self)
+		sprite_draw(self)
+		if self.carry!=0 then
+			spr(self.carry,self.x,self.y-8)
+		end
+	end
 	return r
 end
 
