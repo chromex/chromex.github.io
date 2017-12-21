@@ -5,24 +5,18 @@ __lua__
 
 -- global state
 g={
-	build=64,
+	build=65,
 	debug=false,
+	t=0
 
-	-- time
-	t=0,
-	t2=0,
-	t3=0,
-	t4=0,
-	t5=0,
-	t6=0,
-	t8=0,
-
-	-- app state
-	state=nil,
+	-- time: t,t2,t3,t4,t5,t6,t8
+	-- app state: state
 }
 
 function _init()
-	g.state = menu
+	g.state=menu
+
+	init_bots()
 
 	--map
 	e_sugar=false
@@ -78,7 +72,7 @@ function _update()
 	g.t6=flr(g.t/6)
 	g.t8=flr(g.t/8)
 
-	g.state.update()
+	g.state:update()
 
 	--todo: update to use the new keyboard system
 	--if btnp(4,1) then
@@ -87,10 +81,10 @@ function _update()
 end
 
 function _draw()
-	g.state.draw()
+	g.state:draw()
 
 	if g.debug and g.state.debug_draw != nil then
-		g.state.debug_draw()
+		g.state:debug_draw()
 	end
 	
 	-- todo: move into game.update
@@ -105,7 +99,7 @@ menu={
 	scroll_y=0,
 	fade_step=0,
 
-	update=function ()
+	update=function(self)
 		if btnp(5) then
 			menu.transition=true
 		end
@@ -122,7 +116,7 @@ menu={
 		end
 	end, -- update()
 
-	draw=function()
+	draw=function(self)
 		cls(14)
 		print("happy happy marshmallow factory", 3, 50, 10) 
 			
@@ -205,7 +199,10 @@ game={
 	-- map
 	mlayer=0,
 
-	update = function ()
+	-- objects
+	objs={},
+
+	update=function(self)
 		if e_usecomp then
 			update_upgrades()
 		else
@@ -262,8 +259,6 @@ game={
 			bake()
 		end
 		
-		update_robots()
-		
 		if click() and can_comp() and phase>10 then
 			e_usecomp=true
 		end
@@ -271,6 +266,8 @@ game={
 		if e_customers then
 			update_customers()
 		end
+
+		for o in all(self.objs) do o:update() end
 
 		-- phase shifts
 		if phase==0 then
@@ -388,7 +385,7 @@ game={
 		end
 	end, -- update()
 	
-	draw = function ()
+	draw=function(self)
 		cls()
 		camera(64,0)
 		
@@ -396,10 +393,10 @@ game={
 		
 		-- pickups
 		if e_sugar then
-		draw_sugar(sugar_box[1]+2,sugar_box[2],4)
+			draw_sugar(sugar_box[1]+2,sugar_box[2],4)
 		end
 		if e_bone then
-		draw_bone(bone_box[1]+2,bone_box[2],4)
+			draw_bone(bone_box[1]+2,bone_box[2],4)
 		end
 		
 		-- drop offs {112,46,144,56}
@@ -460,12 +457,13 @@ game={
 				spr(48,184,56)
 			end
 		end
-		draw_robots()
 	
 		if e_chemist then
 			draw_chemist(164,70,true,true)
 		end
-		
+
+		for o in all(self.objs) do o:draw() end
+			
 		draw_chef(false,false)
 		
 		if game.mlayer>3 then
@@ -575,7 +573,7 @@ game={
 		end
 	end, -- draw()
 
-	debug_draw = function ()
+	debug_draw=function(self)
 		rectfill(0,128-13,127,127,8)
 		line(0,128-14,127,128-14,5)
 		print("p:"..phase.." m:"..mallow.." c:"..#customers,1,128-6,2)
@@ -754,7 +752,7 @@ closing={
 	e_pop1=false,
 	pop1x=0,
 
-	update=function ()
+	update=function(self)
 		closing.t+=1
 		local t=closing.t
 
@@ -833,7 +831,7 @@ closing={
 		end
 	end, -- update()
 
-	draw=function ()
+	draw=function(self)
 		cls()
 		camera(0,0)
 		pal(7,closing.starcolor)
@@ -907,6 +905,25 @@ end
 
 function curve(x)
 	return -((x-1)*(x-1))+1
+end
+
+-- todo: evaluate switching from arrays to base spr and spr range for animations
+function create_sprite(x,y,anims,update)
+	-- anim data is a list of lists with each sub-list representing a coherent
+	-- animation set. the first value in that set is the divisor number against
+	-- time, commonly in the 2-6 range, for setting the animation speed
+	return {
+		anims=anims,
+		anim=1,
+		x=x,
+		y=y,
+		update=update,
+		draw=function (self)
+			local a=self.anims[self.anim]
+			local t=flr(g.t/a[1])
+			spr(a[2+t%a[1]],self.x,self.y)
+		end
+	}
 end
 
 function add_sugar(amt)
@@ -1274,7 +1291,7 @@ function purchase(id)
 	elseif id==3 then
 		oven_output=2
 		e_oven1=true
-		robots[4].x+=2
+		robots[4]:inc_x()
 		go_phase(18)
 	elseif id==4 then
 		enable_bot(3)
@@ -1295,7 +1312,7 @@ function purchase(id)
 	elseif id==9 then
 		oven_output+=1
 		e_oven2=true
-		robots[4].x+=2
+		robots[4]:inc_x()
 		go_phase(26)
 	elseif id==10 then
 		go_phase(28)
@@ -1365,97 +1382,83 @@ end
 -->8
 -- automatons
 
-robot_anim={37,39,38,39}
-function draw_robot(x,y,i,item)
-	if i then
-	spr(40+g.t4%4,x,y)
-	else
-		spr(robot_anim[1+g.t4%4],x,y)
-		if item!=0 then
-		spr(item,x,y-8)
-		end
-	end
+-- todo: missing carry item
+
+function create_mover(sx,sy,tx,ty,item,can_work,comp_work)
+	local r=create_sprite(sx,sy,{{4,40,41,42,43},{4,37,39,38,39}},bot_carry_update)
+	r.sx=sx
+	r.sy=sy
+	r.tx=tx
+	r.ty=ty
+	r.s=0
+	r.carry=0
+	r.item=item
+	r.can_work=can_work
+	r.comp_work=comp_work
+	return r
 end
 
-srobot_anim={56,58,57,58}
-function draw_srobot(x,y,i)
-	if i then
-	spr(40+g.t4%4,x+2,y)
-	else
-		spr(srobot_anim[1+g.t4%4],x,y)
-	end 
+function create_spinner(x,y,can_work,do_work)
+	local r=create_sprite(x,y,{{4,40,41,42,43},{4,56,58,57,58}},bot_spin_update)
+	r.can_work=can_work
+	r.do_work=do_work
+	r.sx=x
+	r.ix=x+2
+	r.inc_x=function(self)
+		self.sx+=2
+		self.ix+=2
+	end	
+	return r
 end
 
-robots={
-	{e=false,x=0,y=0,sx=88,sy=40,tx=117,ty=55,s=0,idle=true,item=0},
-	{e=false,x=0,y=0,sx=160,sy=40,tx=131,ty=55,s=0,idle=true,item=0},
-	{e=false,x=134,y=61,idle=true},
-	{e=false,x=135,y=76,idle=true},
-}
+function init_bots()
+	robots={
+		create_mover(88,40,117,55,25,function() return t_sugar==0 end,add_sugar),
+		create_mover(160,40,131,55,5,function() return t_bone==0 end,add_bone),
+		create_spinner(134,61,allow_boil,boil),
+		create_spinner(135,76,allow_bake,bake)
+	}
+end
 
 function enable_bot(b)
-	robots[b].e = true
+	add(game.objs,robots[b])
 end
 
-function exe_delivery(bot,spd,item,do_work)
-	local ret=false
-	if bot.s==0 and bot.item==0 and do_work then
-		bot.item=item
-		bot.idle=false
-	elseif not bot.idle then
-		if bot.item!=0 then
-			bot.s=min(bot.s+spd,1)
+function bot_carry_update(self)
+	if self.anim==2 then
+		local s
+		if self.carry!=0 then
+			s=min(self.s+robot_spd,1)
+
+			if s==1 then
+				self.carry=0
+				self.comp_work(20)
+			end
 		else
-			bot.s=max(bot.s-spd,0)
-		end
+			s=max(self.s-robot_spd,0)
 
-		bot.x=lerp(bot.sx,bot.tx,bot.s)
-		bot.y=lerp(bot.sy,bot.ty,bot.s)
-	end
-	
-	if bot.item!=0 and bot.s==1 then
-		bot.item=0
-		ret = true
-	elseif bot.item==0 and bot.s==0 then
-		bot.idle=true
-	end
-	
-	return ret
-end
-
-function update_robots()
-	if robots[1].e and exe_delivery(robots[1],robot_spd,25,t_sugar==0) then
-		add_sugar(20)
-	end
-	if robots[2].e and exe_delivery(robots[2],robot_spd,5,t_bone==0) then
-		add_bone(20)
-	end
-	
-	if robots[3].e then
-		robots[3].idle = not allow_boil() 
-		if not robots[3].idle then
-			boil()
-		end
-	end
-	
-	if robots[4].e then
-		robots[4].idle = not allow_bake()
-		if not robots[4].idle then
-			bake()
-		end
-	end
-end
-
-function draw_robots()
-	for i=1,#robots do
-		local r=robots[i]
-		if r.e==true then
-			if i<3 then
-				draw_robot(r.x,r.y,r.idle,r.item)
-			else
-				draw_srobot(r.x,r.y,r.idle)
+			if s==0 then
+				self.anim=1
 			end
 		end
+
+		self.x=lerp(self.sx,self.tx,s)
+		self.y=lerp(self.sy,self.ty,s)
+		self.s=s
+	elseif self.s==0 and self.can_work() then
+		self.anim=2
+		self.carry=self.item
+	end
+end
+
+function bot_spin_update(self)
+	if self.can_work() then
+		self.anim=2
+		self.x=self.sx
+		self.do_work()
+	else
+		self.anim=1
+		self.x=self.ix
 	end
 end
 
