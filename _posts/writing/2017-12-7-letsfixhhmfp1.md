@@ -2,7 +2,7 @@
 layout: post
 title: Lets fix my LD40 project! Part 1
 categories: writing
-excerpt: Decent game and awful implementation: the introduction
+excerpt: Decent game and awful implementation, an introduction
 ---
 
 [Ludum Dare 40](https://ldjam.com/) was, as is normal, stressful. While I was trying to finish in 48 hours to qualify for the [compo](https://ldjam.com/events/ludum-dare/rules), the scope of my project and the amount of testing and polishing required was at odds with the goal. My final build was uploaded a nice 20 minutes prior to the close of the jam and in the preceding (almost) 72 hours, I believe I worked about 45-50 of them. During this time, I revisited the story progression three times, published 63 builds, collected bugs and feedback from 10 different testers, and fell pretty far off of the caffeine-free wagon. Again, stressful.

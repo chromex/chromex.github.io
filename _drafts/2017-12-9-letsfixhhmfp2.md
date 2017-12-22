@@ -2,11 +2,23 @@
 layout: post
 title: Lets fix my LD40 project! Part 2
 categories: writing
-excerpt: Sweet sweet refactoring
+excerpt: Sweet sweet refactoring?
 ---
 
-Create a statics object, a game state object: organized system maps of data
-Move game objects to be game objects (de-pollute global state)
-Fix upgrade state split
-Fix phase decl
-Add state reset?
+Huh.
+
+Where to start. In between getting ready for the holidays, crafting presents, visiting friends, and playing games, I've spent some time refactoring. Sadly, that work has been everything but fruitful for the most part. Let's start with what has been done and where we started. 
+
+To begin, [pico-8](https://www.lexaloffle.com/pico-8.php) reported that [Happy Happy Marshmallow Factory](http://loren.io/assets/ld/marshmallow.html) was sitting at around 50% symbol utilization and 52% compressed build output utilization. For those that haven't played with pico-8, these numbers are arbitrary restrictions that exist to create a limited development environment in an effort to simulate a "retro console." The first number, symbol utilization, is actual programming symbols such as '(', ':', or 'function' with each symbol in source code counting as one use. You are only given 8192 symbols maximum which is quite small when you consider that even an empty function declaration consumes 5 symbols. Compressed build size is much more nebulous with the [lua](http://www.lua.org/) output bytecode being compressed and measured against a maximum size. 
+
+While neither the symbol count nor the compressed size are yet hitting problematic levels, they are both measures that you need to keep track of when building a larger pico-8 game as they are hard maximums. Important too is the fact that many techniques for keeping these numbers down are the opposite of what we think of as good coding practices today: global variables, short names for members, etc. Between these two facts it becomes especially important to track these values since my goals with HHMF are to improve data isolation, code readability, and most importantly, make the progression system more tweakable. And all of those are not necessarily good for either number.
+
+The first changes I made was to start containing the data and methods that were only relevant to a specific state: menu, game, or credits. I did this by creating simple lua objects for the states that had their own 'update', 'draw', and 'debug_draw' methods as well as whatever local properties they need. This allowed the top-level update and draw methods to just call the current state's method rather than determining the method based on a number which was done in multiple locations. It also allowed repeat variables between the states to use the same name (since they were now scoped to their object) such as the scroll factor used on both the menu and credit states. This change immediately improved isolation of about half the code though at this point only the menu and credit states have all their members isolated out of global state. 
+
+Overall, I felt that this change was worth it at the high level it was applied, and I would do it again in another pico-8 based game. The downsides of it is that symbol and compressed size numbers slipped about 5% each from the change. I believe the two big drivers of the slip are that any member variable or method accesses must now be prefixed with 'self.' (two symbols), and any member accesses are now string based dictionary lookups in the object since lua doesn't have compiled types. Worse still is the fact that the conversion hasn't been fully applied to the codebase and I believe the tax would be closer to 15-20% if completed.
+
+To counter the issue there are two big tools at hand: continue to use globals for heavy use items, maintain functional programming discipline for as many functions as possible, and to create local copies in functions that repeatedly access the same value. The last one is a relatively micro-optimization since it is only a net positive change if there are at least three accesses in the case that there are no updates to the value. In the scenario that the value is being updated either in that function or another that it calls then it becomes more difficult to measure since additional code will be required to ensure synchronization between the original and local copies. Yuck.
+
+At this point I weighed the initial state object conversion as a success and wanted to extend it to game objects. I did this in the same general form with a lua object having update and draw methods, as well as common elements such as position and animation data. This allowed me to create a generic draw method that could be shared rather than separate and repetitive implementations scattered throughout. To test the system I converted the robots to use it. Overall the number of lines of code didn't change much with a 10% sloc decrease however the symbol and compression count degraded 6% from the conversion. That is a big slip considering the bot gameplay logic only represents about 7% of the codebase. I expect that continued conversion to the system will amortize some of the gameobject system's overhead however it appears that the tax will be probably be consistent for conversions. 
+
+The refactoring is no longer looking so good. While only a small part of the code has actually been updated, the symbol count and compressed size are now both in the low 60% range. I expect that continued conversion will result in utilization hitting around 90% without any additions to the game such as new progression phases, map areas, and the like. This makes me really doubt this effort is worth it. Unfortunately, not refactoring the code leaves the game in a very difficult state for tuning and extending. I'm going to continue playing with it to see what I can achieve but this may be the last post for the game since fighting these limitations are less interesting to me. Meh.
