@@ -1,6 +1,6 @@
 ---
 layout: project
-title: "Happy Happy Marshmallow Factory"
+title: "Ludum Dare 40: Happy Happy Marshmallow Factory"
 excerpt: "A web-based retro clicker game to take you back to your childhood!"
 categories: projects gamejam
 image: ld/mallow.gif
