@@ -4,7 +4,7 @@ __lua__
 -- runnah
 
 g={
-	build=2,
+	build=3,
 	debug=true,
 	t=0
 }
@@ -126,7 +126,7 @@ function make_chef()
 						self.v=0
 						blds:move(self.x-hit[2]+1)
 						for i=0,4 do
-							particles:add(10+flr(rnd(3)),self.x,self.y-4,rnd(10)/10-1,-0.5-rnd(10)/10,1)
+							particles:add(10+flr(rnd(3)),self.x,self.y-4,rnd(10)/10-1,0.5-rnd(10)/5,1)
 						end
 					end
 				end
