@@ -4,9 +4,12 @@ __lua__
 -- runnah
 
 g={
-	build=3,
+	build=4,
 	debug=true,
-	t=0
+	t=0,
+	gravity=0.25,
+	jmp_max=-2.5,
+	jmp_spd=0.3,
 }
 
 function _init()
@@ -60,7 +63,9 @@ menu={
 -- game state
 game={
 	init=function(self)
+		go:init()
 		blds:init()
+		particles:init()
 		self.chef=make_chef()
 		go:add(self.chef)
 	end,
@@ -69,6 +74,10 @@ game={
 		blds:update(self.chef.s)
 		go:update()
 		particles:update()
+
+		if self.chef.d and btnp(5) then
+			self:init()
+		end
 	end,
 
 	draw=function(self)
@@ -80,7 +89,10 @@ game={
 	end,
 
 	debug_draw=function(self)
-		print("b"..g.build,1,122,15)
+		print("b"..g.build.." s"..self.chef.v,1,122,15)
+		if self.chef.f then
+			print("f",1,114,15)
+		end
 	end,
 }
 
@@ -92,18 +104,24 @@ function make_chef()
 		v=0,
 		s=0,
 		d=false,
+		jmp=false,
 
 		update=function(self)
 			if not self.d then
 				-- if we are grounded, speed up
 				if self.f then
 					self.s=3
-					if btnp(5) then
-						self.v=-3
-					end
+					self.jmp=btn(5)
 				end
 
-				self.v+=0.25
+				if self.jmp and btn(5) then
+					self.v=lerp(self.v,g.jmp_max,g.jmp_spd)
+					self.jmp=self.v>(g.jmp_max+0.1)
+				else
+					self.jmp=false
+					self.v+=g.gravity
+				end
+
 				self.y+=self.v
 				self.f=false
 
@@ -124,6 +142,7 @@ function make_chef()
 						self.y=hit[3]
 						self.f=false
 						self.v=0
+						self.jmp=false
 						blds:move(self.x-hit[2]+1)
 						for i=0,4 do
 							particles:add(10+flr(rnd(3)),self.x,self.y-4,rnd(10)/10-1,0.5-rnd(10)/5,1)
@@ -138,6 +157,7 @@ function make_chef()
 
 			if self.d then
 				print("u ded",54,60,10)
+				print("'x' to restart",36,68,10)
 			end
 		end,
 	}
@@ -145,6 +165,10 @@ end
 
 go={
 	lst={},
+
+	init=function(self)
+		self.lst={}
+	end,
 
 	add=function(self,obj)
 		obj.ded=false
@@ -171,7 +195,7 @@ blds={
 	lst={},
 
 	init=function(self)
-		-- todo: delete old buildings
+		self.lst={}
 		self:add()
 		self:add()
 		self:add()
@@ -258,6 +282,10 @@ end
 particles={
 	lst={},
 
+	init=function(self)
+		self.lst={}
+	end,
+
 	add=function(self,s,x,y,vx,vy,t)
 		add(self.lst,{s,x,y,vx,vy,t})
 	end,
@@ -281,6 +309,10 @@ particles={
 		end
 	end,
 }
+
+function lerp(x,y,s)
+	return x+(y-x)*s
+end
 
 __gfx__
 000e00000e000eee00e00e0000777700007777000077770000000000555555555555555555555555000000000000000000000000000000000000000000000000
