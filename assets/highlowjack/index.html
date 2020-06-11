@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>High Low Jack</title>
+    <title>Unity WebGL Player | High Low Jack</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>
@@ -12,13 +12,13 @@
       var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Build.json", {onProgress: UnityProgress});
     </script>
   </head>
-  <body background-color="#303030">
+  <body>
     <div class="webgl-content">
       <div id="unityContainer" style="width: 1024px; height: 768px"></div>
       <div class="footer">
         <div class="webgl-logo"></div>
         <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
-        <div class="title">High Low Jack!</div>
+        <div class="title">High Low Jack</div>
       </div>
     </div>
   </body>
