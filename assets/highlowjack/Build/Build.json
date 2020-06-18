@@ -1,7 +1,7 @@
 {
 "companyName": "loren.io",
 "productName": "High Low Jack",
-"productVersion": "0.1.4",
+"productVersion": "0.1.5",
 "dataUrl": "Build.data.unityweb",
 "wasmCodeUrl": "Build.wasm.code.unityweb",
 "wasmFrameworkUrl": "Build.wasm.framework.unityweb",
