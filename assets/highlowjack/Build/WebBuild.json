@@ -1,7 +1,7 @@
 {
-"companyName": "loren.io",
+"companyName": "Loren Hoffman",
 "productName": "High Low Jack",
-"productVersion": "0.2.2",
+"productVersion": "1.0.0",
 "dataUrl": "WebBuild.data.unityweb",
 "wasmCodeUrl": "WebBuild.wasm.code.unityweb",
 "wasmFrameworkUrl": "WebBuild.wasm.framework.unityweb",
@@ -12,5 +12,5 @@
 "cacheControl": {"default": "must-revalidate"},
 "developmentBuild": true,
 "multithreading": false,
-"unityVersion": "2019.4.8f1"
+"unityVersion": "2019.4.13f1"
 }
