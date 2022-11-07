@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Lord Loren Hoffman">
+
+    <title>RLE to #Life 1.06</title>
+
+    <script>
+        
+        function magic() {
+            var inputBox = document.getElementById("dataBox");
+            var outputBox = document.getElementById("results");
+
+            var rle = inputBox.value;
+            var lines = rle.split("\n");
+
+            var foundMeta = false;
+            var data = "";
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line[0] != "#" && line.length > 0)
+                {
+                    if (!foundMeta)
+                    {
+                        foundMeta = true;
+                    }
+                    else
+                    {
+                        data += line;
+                    }
+                }
+            });
+
+            var output = "#Life 1.06<br/>";
+
+            const DIGIT_EXPRESSION = /^\d$/;
+
+            var x = 0;
+            var y = 0;
+            var mult = null;
+            for (var index = 0; index < data.length; ++index) {
+                var val = data[index];
+
+                if (DIGIT_EXPRESSION.test(val)) {
+                    if (mult == null) {
+                        mult = val - '0';
+                    } else {
+                        mult = mult * 10 + (val - '0');
+                    }
+                } else {
+                    if (mult == null) mult = 1;
+
+                    if (val == 'b')
+                    {
+                        x += mult;
+                    }
+                    else if (val == 'o')
+                    {
+                        for (var i = 0; i < mult; ++i) {
+                            output += `${x + i} ${y}<br/>`;
+                        }
+
+                        x += mult;
+                    }
+                    else if (val == '$')
+                    {
+                        x = 0;
+                        y += mult;
+                    }
+                    else if (val == '!')
+                    {
+                        break;
+                    }
+
+                    mult = null;
+                }
+            }
+
+            outputBox.innerHTML = output;
+        }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+<body>
+    <main>
+        <div class="container">
+            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+                <img class="bi me-2" src="assets/glider.png" height="46" />
+                <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                    <span class="fs-4">#Life 1.06 Converter</span>
+                </div>
+            </header>
+
+            <p>Generates <a href="https://conwaylife.com/wiki/Life_1.06">#Life 1.06</a> data from a <a href="https://conwaylife.com/wiki/Run_Length_Encoded">RLE</a> Conway save. Useful for <b><i>things</i></b>.</p>
+            <textarea id="dataBox" class="form-control" placeholder="RLE data" rows="8"></textarea>
+            <br />
+            <button type="button" onclick="magic()">Convert!</button>
+            <br />
+            <code id="results"></code>
+        </div>
+
+        <div class="container">
+        </div>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+</body>
+</html>
