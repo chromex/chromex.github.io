@@ -9,16 +9,24 @@
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="Build/UnityLoader.js"></script>
     <script>
-      var unityInstance = UnityLoader.instantiate("unityContainer", "Build/WebBuild.json", {onProgress: UnityProgress});
+      var unityInstance = UnityLoader.instantiate(
+        "unityContainer", 
+        "Build/WebBuild.json", 
+        {
+          onProgress: UnityProgress,
+          compatibilityCheck: function (unityInstance, onsuccess, onerror) {
+            if (!UnityLoader.SystemInfo.hasWebGL) {
+              unityInstance.popup("Your browser does not support WebGL",
+                [{text: "OK", callback: onerror}]);
+            } else if (["Edge", "Firefox", "Chrome", "Safari"].indexOf(UnityLoader.SystemInfo.browser) == -1) {
+              unityInstance.popup("Please note that your browser is not currently supported for this Unity WebGL content. Press OK if you wish to continue anyway.",
+                [{text: "OK", callback: onsuccess}]);
+            } else {
+              onsuccess();
+            }
+          }
+        });
     </script>
-    <style>
-      .store-link{
-        width:120px;
-        padding:10px;
-        text-align:center;
-        margin:0 auto;
-      }
-    </style>
   </head>
   <body>
     <div class="webgl-content">
@@ -26,15 +34,8 @@
       <div class="footer">
         <div class="webgl-logo"></div>
         <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
-        <div class="title">
-          <a href="https://apps.apple.com/us/app/high-low-jack/id1527818437">
-            <img style="width:120px;height:40px;" src="appstorelogo.png" alt="App Store Link" />
-          </a>
-        </div>
+        <div class="title">High Low Jack</div>
       </div>
     </div>
-    <!-- <div class="store-link">
-    
-    </div> -->
   </body>
 </html>
